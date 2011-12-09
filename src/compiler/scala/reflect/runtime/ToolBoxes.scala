@@ -60,7 +60,15 @@ trait ToolBoxes extends { self: Universe =>
                 List(List()),
                 List(methdef),
                 NoPosition))
+//        cleanup(objdef)
         resetAllAttrs(objdef)
+      }
+
+      def cleanup[A<:Tree](x:A): A = new CleanupTransformer().transform(x).asInstanceOf[A]
+      private class CleanupTransformer extends Transformer {
+        override def transform(tree: Tree) = tree match {
+          case _ => super.transform(tree)
+        }
       }
 
       def wrapInPackage(clazz: Tree): PackageDef =
