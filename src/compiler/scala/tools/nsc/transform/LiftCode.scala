@@ -473,8 +473,12 @@ abstract class LiftCode extends Transform with TypingTransformers {
       case Ident(_) if !(boundSyms contains tree.symbol) =>
         reifyFree(tree)
       case tt: TypeTree if (tt.tpe != null) =>
-        if (!(boundSyms exists (tt.tpe contains _))) mirrorCall("TypeTree", reifyType(tt.tpe))
-        else if (tt.original != null) reify(tt.original)
+        // @EB: TypeTrees never get reified per se in order to avoid lifting symbols
+        // mirrorCall("TypeTree", reifyType(tt.tpe))
+        // They are: 1) either provided by user (i.e. have the original filled in)
+        // and are reified using the originals, which are parse-time trees
+        if (tt.original != null) reify(tt.original)
+        // or 2) have been inferred by the compiler (i.e. don't need to be lifted at all)
         else mirrorCall("TypeTree")
       case global.emptyValDef =>
         mirrorSelect("emptyValDef")
