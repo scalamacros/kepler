@@ -480,6 +480,11 @@ abstract class LiftCode extends Transform with TypingTransformers {
         if (tt.original != null) reify(tt.original)
         // or 2) have been inferred by the compiler (i.e. don't need to be lifted at all)
         else mirrorCall("TypeTree")
+      case ta @ TypeApply(hk, ts) =>
+        val tts = ts collect { case tt: TypeTree => tt }
+        val ttsNotEssential = tts find { tt => tt.original != null } isEmpty
+        val othersNotEssential = ts.length == tts.length
+        if (ttsNotEssential && othersNotEssential) reifyTree(hk) else reifyProduct(ta)
       case global.emptyValDef =>
         mirrorSelect("emptyValDef")
       case _ =>
