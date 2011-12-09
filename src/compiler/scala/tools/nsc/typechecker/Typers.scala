@@ -1151,7 +1151,12 @@ trait Typers extends Modes with Adaptations with PatMatVirtualiser {
           val supertpt1 = typedType(supertpt)
           if (!supertpt1.tpe.isError) {
             mixins = supertpt1 :: mixins
-            supertpt = TypeTree(supertpt1.tpe.parents.head) setPos supertpt.pos.focus
+            var tpt = TypeTree(supertpt1.tpe.parents.head)
+            if (tpt.symbol == definitions.ObjectClass) {
+              val original = Select(Select(Ident(definitions.JavaLangPackage.owner), newTermName("lang")), newTypeName("Object"))
+              tpt = tpt setOriginal original
+            }
+            supertpt = tpt setPos supertpt.pos.focus
           }
         }
 
