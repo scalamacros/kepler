@@ -508,9 +508,11 @@ trait Infer {
      *    type parameters that are inferred as `scala.Nothing` and that are not covariant in <code>restpe</code> are taken to be undetermined
      */
     def adjustTypeArgs(tparams: List[Symbol], tvars: List[TypeVar], targs: List[Type], restpe: Type = WildcardType): AdjustedTypeArgs.Result  = {
-      @inline def keep(targ: Type, tparam: Symbol) = (
-          targ.typeSymbol != NothingClass // definitely not retracting, it's not Nothing!
-          || (!restpe.isWildcard && (varianceInType(restpe)(tparam) & COVARIANT) != 0)) // occured covariantly --> don't retract
+      @inline def keep(targ: Type, tparam: Symbol) = {
+        val cond1 = targ.typeSymbol != NothingClass // definitely not retracting, it's not Nothing!
+        val cond2 = (!restpe.isWildcard && (varianceInType(restpe)(tparam) & COVARIANT) != 0) // occured covariantly --> don't retract
+        cond1 || cond2
+      } 
 
       @inline def adjusted(targ: Type, tvar: TypeVar) =
         if (targ.typeSymbol == RepeatedParamClass)
