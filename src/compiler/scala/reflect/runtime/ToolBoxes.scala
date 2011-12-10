@@ -47,13 +47,13 @@ trait ToolBoxes extends { self: Universe =>
         obj setInfo obj.moduleClass.tpe
         val meth = obj.moduleClass.newMethod(NoPosition, wrapperMethodName)
         def makeParam(fv: Symbol) = meth.newValueParameter(NoPosition, fv.name) setInfo fv.tpe
-        meth setInfo MethodType(fvs map makeParam, expr.tpe)
+        meth setInfo MethodType(fvs map makeParam, AnyClass.tpe)
         minfo.decls enter meth
         val methdef = DefDef(meth, expr)
         val objdef = ModuleDef(
             obj,
             Template(
-                List(TypeTree(ObjectClass.tpe)),
+                List(TypeTree(ObjectClass.tpe), TypeTree(ScalaObjectClass.tpe)),
                 emptyValDef,
                 NoMods,
                 List(),
@@ -108,10 +108,15 @@ trait ToolBoxes extends { self: Universe =>
         val jfield = jclazz.getDeclaredFields.find(_.getName == NameTransformer.MODULE_INSTANCE_NAME).get
         val singleton = jfield.get(null)
         val result = jmeth.invoke(singleton, fvs map (sym => sym.asInstanceOf[FreeVar].value.asInstanceOf[AnyRef]): _*)
-        if (etpe.typeSymbol != FunctionClass(0)) result
-        else {
-          val applyMeth = result.getClass.getMethod("apply")
-          applyMeth.invoke(result)
+        
+        if (etpe != null) {
+          if (etpe.typeSymbol != FunctionClass(0)) result
+          else {
+            val applyMeth = result.getClass.getMethod("apply")
+            applyMeth.invoke(result)
+          }
+        } else {
+          result
         }
       }
     }
