@@ -510,8 +510,17 @@ trait Infer {
     def adjustTypeArgs(tparams: List[Symbol], tvars: List[TypeVar], targs: List[Type], restpe: Type = WildcardType): AdjustedTypeArgs.Result  = {
       @inline def keep(targ: Type, tparam: Symbol) = {
         val cond1 = targ.typeSymbol != NothingClass // definitely not retracting, it's not Nothing!
-        val cond2 = (!restpe.isWildcard && (varianceInType(restpe)(tparam) & COVARIANT) != 0) // occured covariantly --> don't retract
-        cond1 || cond2
+        if (cond1) {
+          true
+        } else {
+          val cond21 = !restpe.isWildcard
+          if (cond21) {
+            val variance = varianceInType(restpe)(tparam);
+            (variance & COVARIANT) != 0 // occured covariantly --> don't retract
+          } else {
+            false
+          }
+        }
       } 
 
       @inline def adjusted(targ: Type, tvar: TypeVar) =

@@ -73,13 +73,19 @@ trait Variances {
       if (sym == tparam) COVARIANT
       // tparam cannot occur in tp's args if tp is a type constructor (those don't have args)
       else if (tp.isHigherKinded) varianceInType(pre)(tparam)
-      else varianceInType(pre)(tparam) & varianceInArgs(args, sym.typeParams)(tparam)
+      else {
+        val var1 = varianceInType(pre)(tparam)
+        val var2 = varianceInArgs(args, sym.typeParams)(tparam)
+        var1 & var2
+      }
     case TypeBounds(lo, hi) =>
       flip(varianceInType(lo)(tparam)) & varianceInType(hi)(tparam)
     case RefinedType(parents, defs) =>
       varianceInTypes(parents)(tparam) & varianceInSyms(defs.toList)(tparam)
     case MethodType(params, restpe) =>
-      flip(varianceInSyms(params)(tparam)) & varianceInType(restpe)(tparam)
+      val var1 = flip(varianceInSyms(params)(tparam)) 
+      val var2 = varianceInType(restpe)(tparam)
+      var1 & var2
     case NullaryMethodType(restpe) =>
       varianceInType(restpe)(tparam)
     case PolyType(tparams, restpe) =>
