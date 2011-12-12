@@ -30,7 +30,7 @@ object Test extends App {
   val toolbox = new ToolBox(reporter)
 //  val ttree = toolbox.typeCheck(code.tree)
   val run = new toolbox.compiler.Run
-  toolbox.compiler.phase = run.refchecksPhase
+  toolbox.compiler.phase = run.parserPhase
   var ttree = toolbox.importer.importTree(code.tree.asInstanceOf[toolbox.importer.from.Tree])
 //  ttree = toolbox.compiler.typer.typed(ttree, toolbox.compiler.analyzer.EXPRmode, toolbox.compiler.WildcardType)
   println(toolbox.compiler.runExpr(ttree))

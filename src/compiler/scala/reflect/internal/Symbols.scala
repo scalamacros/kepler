@@ -62,6 +62,10 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
              with HasFlags
              with Annotatable[Symbol] {
 
+    if (initName.toString() == "CanBuildFrom") {
+      println("blah")
+    } 
+    
     type FlagsType          = Long
     type AccessBoundaryType = Symbol
     type AnnotationType     = AnnotationInfo
@@ -889,6 +893,10 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
      *  ensuring that symbol is initialized (i.e. type is completed).
      */
     def info: Type = try {
+      if (id == 4811 || initName.toString == "CanBuildFrom") {
+        println("stuff")
+      }
+      
       var cnt = 0
       while (validTo == NoPeriod) {
         //if (settings.debug.value) System.out.println("completing " + this);//DEBUG
@@ -962,6 +970,10 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       assert(infos != null)
       val curPeriod = currentPeriod
       val curPid = phaseId(curPeriod)
+      
+      if (id == 4811 || initName.toString == "CanBuildFrom") {
+        println("stuff")
+      }
 
       if (validTo != NoPeriod) {
         // skip any infos that concern later phases
@@ -1099,8 +1111,13 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       else {
         if (validTo == NoPeriod)
           atPhase(phaseOf(infos.validFrom))(rawInfo load this)
-
-        rawInfo.typeParams
+          
+        if (initName.toString == "CanBuildFrom") {
+          val x = 2 + 2
+          info.typeParams
+        } else {
+          rawInfo.typeParams
+        }
       }
 
     /** The value parameter sections of this symbol.
