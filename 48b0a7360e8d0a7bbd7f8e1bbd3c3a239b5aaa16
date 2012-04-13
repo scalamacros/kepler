@@ -1,0 +1,1741 @@
+myke compile-alt C:\Projects\Kepler
+psi: filename = cmd.exe, arguments = /C ant build -buildfile build.xml, home = C:\Projects\Kepler
+Buildfile: C:\Projects\Kepler\build.xml
+
+init.jars.check:
+
+init.jars:
+
+init.maven.tasks:
+
+init.maven.jars:
+
+init.hasbuildnum:
+
+init.build.snapshot:
+
+init.build.release:
+
+init.build.nopatch.release:
+
+init.build.patch.release:
+
+init.build.suffix.done:
+
+init.version.git:
+
+init.version.release:
+
+init.version.snapshot:
+
+init.version.done:
+
+init:
+     [echo]        build time: 13 April 2012, 10:34:10
+     [echo]      java version: Java HotSpot(TM) 64-Bit Server VM 1.6.0_25
+     [echo]         java args: -Xss128m -Xms3072m -Xmx3072m -XX:+UseParallelGC -XX:MaxPermSize=1024M
+     [echo]        javac args:
+     [echo]       scalac args: -Xmacros -Ystatistics
+     [echo]          git date: 20120413-032354
+     [echo]          git hash: 20cd7cc077
+     [echo]     maven version: 2.10.0-SNAPSHOT
+     [echo]      OSGi version: 2.10.0.v20120413-032354-20cd7cc077
+     [echo] canonical version: 2.10.0-20120413-032354-20cd7cc077
+
+locker.start:
+
+locker.pre-lib:
+
+locker.lib:
+
+locker.pre-comp:
+
+locker.comp:
+
+locker.done:
+
+quick.start:
+
+quick.pre-lib:
+
+quick.lib:
+[scalacfork] Compiling 744 files to C:\Projects\Kepler\build\quick\classes\library
+[scalacfork] Enabling statistics, measuring overhead = 47.2487ns to 351.3026ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 377512
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 1063573
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 360998
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 67201, Select: 65132, Ident: 41702, Apply: 31791, This: 25981, ValDef: 21139, : 20988, DefDef: 19383, Literal: 14784, TypeDef: 10293, TypeApply: 6963, Block: 6764, New: 3023, If: 2936, CaseDef: 2877, Template: 2556, Bind: 2259, Super: 2202, ClassDef: 1945, Assign: 1322, Function: 1190, Import: 1093, ApplyConstructor: 1074, PackageDef: 1043, Match: 1014, ApplyImplicitView: 807, Typed: 758, ApplyToImplicitArgs: 713, ModuleDef: 611, Throw: 538, LabelDef: 461, Return: 177, Try: 101, AppliedTypeTree: 71, UnApply: 63, Alternative: 32, Star: 9, BackQuotedIdent: 2)
+[scalacfork] #typechecked identifiers : 156447
+[scalacfork] #typechecked selections  : 120342
+[scalacfork] #typechecked applications: 36456
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 420597
+[scalacfork] #symbols                 : 449224
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 32422052235ns (100,0%)
+[scalacfork] time classfilereading      : 258 spans, 658862525ns (2,0%)
+[scalacfork] time spent in implicits    : 15293 spans, 7306033364ns (22,5%)
+[scalacfork]     successful in scope    : 8260 spans, 2410837304ns (7,4%)
+[scalacfork]         failed in scope    : 14679 spans, 2470906503ns (7,6%)
+[scalacfork]      successful of type    : 7255 spans, 1888389799ns (5,8%)
+[scalacfork]          failed of type    : 13842 spans, 602058427ns (1,9%)
+[scalacfork]        assembling parts    : 1046 spans, 460532445ns (1,4%)
+[scalacfork]               matchesPT    : 15840 spans, 633838519ns (2,0%)
+[scalacfork] implicit cache hits        : 12791 (92,4%)
+[scalacfork] time spent in failed       : 91352 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 29826 spans, 6253276ns (0,0%)
+[scalacfork]        failed op=          : 18838 spans, 503923732ns (1,6%)
+[scalacfork] time spent ref scanning    : 4 spans, 604382ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Apply: 8419301, Select: 6718145, Ident: 4401687, DefDef: 2528328, Block: 2102147, ClassDef: 1660657, AppliedTypeTree: 1477251, Match: 1144458, ApplyConstructor: 862586, Literal: 450117, If: 327663, ModuleDef: 314883, TypeApply: 248220, ValDef: 184752, New: 150020, TypeBoundsTree: 142587, Function: 107670, PackageDef: 93575, This: 84300, Typed: 80065, ApplyToImplicitArgs: 42330, TypeDef: 33031, SelectFromTypeTree: 32114, Super: 30330, ExistentialTypeTree: 28923, TypeTree: 28387, Bind: 27632, ApplyImplicitView: 23154, Assign: 21108, Throw: 16790, Try: 9902, Annotated: 9251, LabelDef: 6938, CompoundTypeTree: 4690, SingletonTypeTree: 3092, Return: 2083, : 1824, Alternative: 1325, AssignOrNamedArg: 955, BackQuotedIdent: 130, Star: 52)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 180191, Select: 151092, Apply: 34134, AppliedTypeTree: 29954, TypeTree: 26889, Literal: 23095, TypeBoundsTree: 20945, DefDef: 19383, Block: 11496, This: 10689, ValDef: 5856, New: 3783, ApplyConstructor: 3449, TypeApply: 3083, If: 2962, Super: 2449, Bind: 2403, : 1952, ClassDef: 1945, Assign: 1894, Function: 1766, ApplyImplicitView: 1524, Match: 1117, PackageDef: 1043, ApplyToImplicitArgs: 835, Typed: 757, TypeDef: 756, SingletonTypeTree: 694, ModuleDef: 611, Throw: 539, LabelDef: 462, ExistentialTypeTree: 436, CompoundTypeTree: 224, Annotated: 211, SelectFromTypeTree: 193, Return: 179, Try: 102, Alternative: 32, AssignOrNamedArg: 18, Star: 9, BackQuotedIdent: 2)
+[scalacfork] avg micros by tree node    : ArrayBuffer(Match: 1024, ClassDef: 853, ModuleDef: 515, ApplyConstructor: 250, Apply: 246, Block: 182, SelectFromTypeTree: 166, DefDef: 130, If: 110, Typed: 105, Try: 97, PackageDef: 89, TypeApply: 80, ExistentialTypeTree: 66, BackQuotedIdent: 65, Function: 60, AssignOrNamedArg: 53, ApplyToImplicitArgs: 50, AppliedTypeTree: 49, Select: 44, TypeDef: 43, Annotated: 43, Alternative: 41, New: 39, Throw: 31, ValDef: 31, Ident: 24, CompoundTypeTree: 20, Literal: 19, ApplyImplicitView: 15, LabelDef: 15, Super: 12, Bind: 11, Return: 11, Assign: 11, This: 7, TypeBoundsTree: 6, Star: 5, SingletonTypeTree: 4, TypeTree: 1, : 0)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 15293
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 1833, 1833, 1762, 1713
+[scalacfork] #implicit improves tests   : 2637
+[scalacfork] #implicit improves cached  : 1433
+[scalacfork] #implicit inscope hits     : 1228
+[scalacfork] #implicit oftype hits      : 446
+[scalacfork] #macro expansions          : 228
+[scalacfork] #time spent in macroExpand : 228 spans, 834174335ns (2,6%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 1950416
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 618409
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 116511, Select: 105620, Apply: 87052, Ident: 53827, This: 47631, DefDef: 41507, ValDef: 41405, : 40198, Literal: 17721, Block: 16029, TypeApply: 12093, New: 7530, ClassDef: 5332, Template: 5332, If: 5052, Super: 4246, Typed: 2276, Assign: 1474, Throw: 1173, ApplyConstructor: 1141, PackageDef: 1043, LabelDef: 918, ApplyImplicitView: 877, CaseDef: 853, ApplyToImplicitArgs: 781, ArrayValue: 288, Return: 156, Match: 135, Try: 119, Bind: 88, TypeDef: 1)
+[scalacfork] #typechecked identifiers : 217099
+[scalacfork] #typechecked selections  : 228347
+[scalacfork] #typechecked applications: 144298
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 758477
+[scalacfork] #symbols                 : 1260949
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 2469806
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 937483
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 191159, TypeTree: 159965, Ident: 112252, Apply: 106074, : 70496, ValDef: 70123, This: 69911, DefDef: 61164, Literal: 20798, Block: 16344, New: 9270, Assign: 7325, TypeApply: 7294, If: 7215, ClassDef: 5332, Template: 5332, Super: 4364, ApplyConstructor: 2826, Throw: 2734, Typed: 2276, PackageDef: 1043, LabelDef: 918, ApplyImplicitView: 857, CaseDef: 853, ApplyToImplicitArgs: 771, ArrayValue: 288, Return: 156, Match: 135, Try: 119, Bind: 88, TypeDef: 1)
+[scalacfork] #typechecked identifiers : 245048
+[scalacfork] #typechecked selections  : 264121
+[scalacfork] #typechecked applications: 173247
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 811275
+[scalacfork] #symbols                 : 1414354
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] warning: there were 129 deprecation warnings; re-run with -deprecation for details
+[scalacfork] warning: there were 32 unchecked warnings; re-run with -unchecked for details
+[scalacfork] two warnings found
+[scalacfork] Compiling 48 files to C:\Projects\Kepler\build\quick\classes\library
+[scalacfork] Enabling statistics, measuring overhead = 43.4467ns to 329.9781ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 15416
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 42219
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 17661
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 3539, TypeTree: 2788, Ident: 1982, Apply: 1694, This: 1620, ValDef: 1073, DefDef: 951, : 946, Literal: 683, Block: 483, TypeApply: 318, New: 166, If: 159, CaseDef: 158, Template: 120, Super: 119, ClassDef: 90, Bind: 87, ApplyConstructor: 82, Function: 75, Assign: 74, PackageDef: 67, Match: 65, TypeDef: 61, Import: 48, ApplyImplicitView: 47, Typed: 38, Throw: 36, ModuleDef: 30, LabelDef: 24, Try: 24, Return: 6, ApplyToImplicitArgs: 5, UnApply: 1, AppliedTypeTree: 1, Alternative: 1)
+[scalacfork] #typechecked identifiers : 6100
+[scalacfork] #typechecked selections  : 3359
+[scalacfork] #typechecked applications: 1972
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 19051
+[scalacfork] #symbols                 : 48374
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 4861002873ns (100,0%)
+[scalacfork] time classfilereading      : 390 spans, 729904155ns (15,0%)
+[scalacfork] time spent in implicits    : 368 spans, 1693441214ns (34,8%)
+[scalacfork]     successful in scope    : 208 spans, 220560361ns (4,5%)
+[scalacfork]         failed in scope    : 344 spans, 901318276ns (18,5%)
+[scalacfork]      successful of type    : 162 spans, 477903710ns (9,8%)
+[scalacfork]          failed of type    : 318 spans, 71938345ns (1,5%)
+[scalacfork]        assembling parts    : 74 spans, 159266772ns (3,3%)
+[scalacfork]               matchesPT    : 527 spans, 67724749ns (1,4%)
+[scalacfork] implicit cache hits        : 244 (76,7%)
+[scalacfork] time spent in failed       : 3385 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 1656 spans, 0ns (0,0%)
+[scalacfork]        failed op=          : 998 spans, 47864495ns (1,0%)
+[scalacfork] time spent ref scanning    : 0 spans, 0ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Apply: 1819818, Select: 1094076, Ident: 698987, DefDef: 230254, ClassDef: 189218, AppliedTypeTree: 166331, ApplyConstructor: 133911, Block: 109255, If: 55766, ModuleDef: 54235, Match: 51099, ValDef: 47813, Try: 21370, TypeApply: 21041, New: 20354, Literal: 19957, PackageDef: 17379, Function: 17115, This: 13492, TypeTree: 10422, TypeDef: 7396, Super: 5709, ExistentialTypeTree: 5613, Typed: 5437, Assign: 4439, ApplyImplicitView: 3982, TypeBoundsTree: 3789, Bind: 2773, SelectFromTypeTree: 2484, LabelDef: 1501, CompoundTypeTree: 1495, ApplyToImplicitArgs: 1389, Throw: 1039, Annotated: 688, Alternative: 559, : 184, Return: 174)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 6484, Select: 4333, Apply: 1709, TypeTree: 1543, Literal: 953, DefDef: 951, AppliedTypeTree: 877, This: 806, Block: 746, ValDef: 389, New: 195, If: 180, Assign: 180, ApplyConstructor: 180, TypeBoundsTree: 151, Super: 119, TypeApply: 115, Match: 99, ApplyImplicitView: 94, ClassDef: 90, Bind: 87, Function: 72, PackageDef: 67, : 39, Typed: 36, Throw: 36, TypeDef: 32, ModuleDef: 30, ExistentialTypeTree: 26, LabelDef: 24, Try: 24, ApplyToImplicitArgs: 6, Return: 6, CompoundTypeTree: 2, Annotated: 2, SelectFromTypeTree: 1, Alternative: 1)
+[scalacfork] avg micros by tree node    : ArrayBuffer(SelectFromTypeTree: 2484, ClassDef: 2102, ModuleDef: 1807, Apply: 1064, Try: 890, CompoundTypeTree: 747, ApplyConstructor: 743, Alternative: 559, Match: 516, Annotated: 344, If: 309, PackageDef: 259, Select: 252, DefDef: 242, Function: 237, TypeDef: 231, ApplyToImplicitArgs: 231, ExistentialTypeTree: 215, AppliedTypeTree: 189, TypeApply: 182, Typed: 151, Block: 146, ValDef: 122, Ident: 107, New: 104, LabelDef: 62, Super: 47, ApplyImplicitView: 42, Bind: 31, Return: 29, Throw: 28, TypeBoundsTree: 25, Assign: 24, Literal: 20, This: 16, TypeTree: 6, : 4)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 368
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 128, 128, 128, 128
+[scalacfork] #implicit improves tests   : 120
+[scalacfork] #implicit improves cached  : 64
+[scalacfork] #implicit inscope hits     : 48
+[scalacfork] #implicit oftype hits      : 4
+[scalacfork] #macro expansions          : 2
+[scalacfork] #time spent in macroExpand : 2 spans, 282840723ns (5,8%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 83404
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 27531
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 5117, TypeTree: 4854, Apply: 3859, Ident: 2345, This: 2182, ValDef: 1773, DefDef: 1617, : 1581, Block: 1060, Literal: 784, TypeApply: 483, New: 358, If: 263, Template: 228, ClassDef: 228, Super: 192, Typed: 133, Assign: 76, CaseDef: 68, PackageDef: 67, Throw: 60, LabelDef: 49, ApplyImplicitView: 47, ApplyConstructor: 30, Try: 24, Bind: 21, ArrayValue: 11, Match: 10, Return: 6, ApplyToImplicitArgs: 5)
+[scalacfork] #typechecked identifiers : 8602
+[scalacfork] #typechecked selections  : 8263
+[scalacfork] #typechecked applications: 6626
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 38541
+[scalacfork] #symbols                 : 84780
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 112091
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 45219
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 9101, TypeTree: 7609, Ident: 5563, Apply: 5098, This: 3610, ValDef: 3307, : 3229, DefDef: 2999, Block: 1069, Literal: 864, Assign: 439, New: 410, TypeApply: 332, If: 321, Template: 228, ClassDef: 228, Super: 193, Typed: 133, Throw: 102, ApplyConstructor: 76, CaseDef: 68, PackageDef: 67, LabelDef: 49, ApplyImplicitView: 47, Try: 24, Bind: 21, ArrayValue: 11, Match: 10, Return: 6, ApplyToImplicitArgs: 5)
+[scalacfork] #typechecked identifiers : 10027
+[scalacfork] #typechecked selections  : 10433
+[scalacfork] #typechecked applications: 8281
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 40286
+[scalacfork] #symbols                 : 92914
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] warning: there were 9 deprecation warnings; re-run with -deprecation for details
+[scalacfork] one warning found
+[scalacfork] Compiling 66 files to C:\Projects\Kepler\build\quick\classes\library
+[scalacfork] Enabling statistics, measuring overhead = 44.6257ns to 346.6271ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 13735
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 36309
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 16201
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 3129, TypeTree: 2658, Ident: 1692, This: 1378, DefDef: 1331, Apply: 1073, Literal: 845, ValDef: 801, : 588, Block: 486, Super: 272, Template: 272, TypeApply: 247, New: 226, ClassDef: 222, CaseDef: 203, ApplyConstructor: 200, PackageDef: 136, Bind: 80, Match: 67, If: 55, ModuleDef: 50, Throw: 44, UnApply: 39, Import: 30, TypeDef: 25, Typed: 18, Function: 14, ApplyToImplicitArgs: 8, Alternative: 4, Assign: 4, Try: 2, ApplyImplicitView: 1, AppliedTypeTree: 1)
+[scalacfork] #typechecked identifiers : 3946
+[scalacfork] #typechecked selections  : 3207
+[scalacfork] #typechecked applications: 1404
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 12654
+[scalacfork] #symbols                 : 33748
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 4044971056ns (100,0%)
+[scalacfork] time classfilereading      : 190 spans, 578784405ns (14,3%)
+[scalacfork] time spent in implicits    : 119 spans, 1065181031ns (26,3%)
+[scalacfork]     successful in scope    : 60 spans, 9605132ns (0,2%)
+[scalacfork]         failed in scope    : 118 spans, 663507522ns (16,4%)
+[scalacfork]      successful of type    : 63 spans, 157861105ns (3,9%)
+[scalacfork]          failed of type    : 114 spans, 172359846ns (4,3%)
+[scalacfork]        assembling parts    : 56 spans, 249061021ns (6,2%)
+[scalacfork]               matchesPT    : 155 spans, 25983919ns (0,6%)
+[scalacfork] implicit cache hits        : 62 (52,5%)
+[scalacfork] time spent in failed       : 2734 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 992 spans, 0ns (0,0%)
+[scalacfork]        failed op=          : 702 spans, 0ns (0,0%)
+[scalacfork] time spent ref scanning    : 0 spans, 0ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Apply: 1597944, Ident: 595648, Select: 527949, Block: 312691, ClassDef: 262992, DefDef: 245834, AppliedTypeTree: 100989, ModuleDef: 70862, ApplyConstructor: 58095, ValDef: 37653, If: 35167, Match: 32006, Literal: 29008, PackageDef: 20572, This: 17438, TypeTree: 16382, TypeApply: 14270, New: 11016, Function: 9059, Super: 6165, TypeDef: 4409, ExistentialTypeTree: 3854, Bind: 3477, Typed: 3320, TypeBoundsTree: 1270, Throw: 1249, ApplyToImplicitArgs: 1053, Alternative: 1014, Try: 720, Assign: 526, : 456, SelectFromTypeTree: 294, ApplyImplicitView: 219, SingletonTypeTree: 42)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 4454, Select: 4045, TypeTree: 2629, Literal: 1467, DefDef: 1331, Apply: 1119, Block: 1032, This: 1014, ValDef: 498, AppliedTypeTree: 444, New: 390, ApplyConstructor: 308, Super: 272, ClassDef: 222, PackageDef: 136, TypeApply: 132, : 104, Bind: 84, Match: 68, If: 56, ModuleDef: 50, Throw: 44, TypeBoundsTree: 42, Function: 20, Typed: 18, Assign: 11, TypeDef: 10, ApplyToImplicitArgs: 8, Alternative: 4, ExistentialTypeTree: 3, SelectFromTypeTree: 2, SingletonTypeTree: 2, Try: 2, ApplyImplicitView: 1)
+[scalacfork] avg micros by tree node    : ArrayBuffer(Apply: 1428, ModuleDef: 1417, ExistentialTypeTree: 1284, ClassDef: 1184, If: 627, Match: 470, Function: 452, TypeDef: 440, Try: 360, Block: 302, Alternative: 253, AppliedTypeTree: 227, ApplyImplicitView: 219, ApplyConstructor: 188, DefDef: 184, Typed: 184, PackageDef: 151, SelectFromTypeTree: 147, Ident: 133, ApplyToImplicitArgs: 131, Select: 130, TypeApply: 108, ValDef: 75, Assign: 47, Bind: 41, TypeBoundsTree: 30, New: 28, Throw: 28, Super: 22, SingletonTypeTree: 21, Literal: 19, This: 17, TypeTree: 6, : 4)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 119
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 9, 9, 9, 9
+[scalacfork] #implicit improves tests   : 48
+[scalacfork] #implicit improves cached  : 36
+[scalacfork] #implicit inscope hits     : 1
+[scalacfork] #implicit oftype hits      : 8
+[scalacfork] #macro expansions          : 0
+[scalacfork] #time spent in macroExpand : 0 spans, 0ns (0,0%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 67153
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 20668
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 3807, Select: 3653, Apply: 2705, This: 1671, DefDef: 1607, Ident: 1561, ValDef: 1194, Literal: 859, Block: 804, : 740, New: 310, TypeApply: 298, ClassDef: 286, Super: 286, Template: 286, If: 199, PackageDef: 136, Throw: 76, CaseDef: 69, ApplyConstructor: 30, Typed: 28, LabelDef: 24, Match: 12, ArrayValue: 10, ApplyToImplicitArgs: 8, Assign: 4, Try: 2, Bind: 2, ApplyImplicitView: 1)
+[scalacfork] #typechecked identifiers : 5655
+[scalacfork] #typechecked selections  : 6752
+[scalacfork] #typechecked applications: 4472
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 30282
+[scalacfork] #symbols                 : 65187
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 79397
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 23255
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 4259, TypeTree: 3871, Apply: 2702, This: 2068, Ident: 1917, DefDef: 1544, ValDef: 1323, : 1282, Literal: 888, Block: 730, Assign: 508, New: 344, ClassDef: 286, Super: 286, Template: 286, TypeApply: 262, If: 233, PackageDef: 136, Throw: 110, CaseDef: 69, ApplyConstructor: 64, Typed: 28, LabelDef: 24, Match: 12, ArrayValue: 10, ApplyToImplicitArgs: 8, Try: 2, Bind: 2, ApplyImplicitView: 1)
+[scalacfork] #typechecked identifiers : 5785
+[scalacfork] #typechecked selections  : 7381
+[scalacfork] #typechecked applications: 4566
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 31964
+[scalacfork] #symbols                 : 71575
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] Compiling 88 files to C:\Projects\Kepler\build\quick\classes\library
+[scalacfork] Enabling statistics, measuring overhead = 42.4959ns to 332.2968ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 23091
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 74365
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 33008
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 6898, TypeTree: 5751, This: 3129, Ident: 2941, Apply: 2907, DefDef: 2562, ValDef: 2001, : 1714, Literal: 1408, Block: 676, TypeApply: 478, Template: 389, Super: 360, New: 297, ClassDef: 270, ApplyConstructor: 235, CaseDef: 188, Import: 127, ModuleDef: 119, PackageDef: 119, If: 87, Match: 71, TypeDef: 60, Function: 52, Throw: 48, Assign: 31, Bind: 24, Typed: 20, ApplyToImplicitArgs: 18, ApplyImplicitView: 18, Try: 3, Alternative: 3, LabelDef: 3, UnApply: 1)
+[scalacfork] #typechecked identifiers : 9287
+[scalacfork] #typechecked selections  : 5903
+[scalacfork] #typechecked applications: 3265
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 26499
+[scalacfork] #symbols                 : 73280
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 7998643368ns (100,0%)
+[scalacfork] time classfilereading      : 543 spans, 1184057119ns (14,8%)
+[scalacfork] time spent in implicits    : 1139 spans, 2300185015ns (28,8%)
+[scalacfork]     successful in scope    : 586 spans, 709521242ns (8,9%)
+[scalacfork]         failed in scope    : 1122 spans, 710819342ns (8,9%)
+[scalacfork]      successful of type    : 561 spans, 631015658ns (7,9%)
+[scalacfork]          failed of type    : 1098 spans, 157010041ns (2,0%)
+[scalacfork]        assembling parts    : 112 spans, 331642206ns (4,1%)
+[scalacfork]               matchesPT    : 520 spans, 112643350ns (1,4%)
+[scalacfork] implicit cache hits        : 986 (89,8%)
+[scalacfork] time spent in failed       : 5873 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 2738 spans, 0ns (0,0%)
+[scalacfork]        failed op=          : 1634 spans, 24744363ns (0,3%)
+[scalacfork] time spent ref scanning    : 0 spans, 0ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Apply: 2206695, Select: 1651568, Ident: 1192562, Block: 1180652, DefDef: 497034, ClassDef: 486202, ModuleDef: 205989, AppliedTypeTree: 103529, ApplyConstructor: 100277, TypeApply: 51329, If: 36633, ValDef: 31553, Match: 28494, PackageDef: 28173, This: 28022, New: 26921, Literal: 24227, Function: 14106, TypeTree: 13336, Super: 10740, Typed: 9164, ExistentialTypeTree: 6424, ApplyImplicitView: 3540, TypeDef: 3266, TypeBoundsTree: 2702, ApplyToImplicitArgs: 2539, CompoundTypeTree: 2100, Assign: 1760, Bind: 1431, Annotated: 1115, Try: 972, LabelDef: 849, Alternative: 790, SingletonTypeTree: 719, Throw: 558, : 317)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 10373, Select: 8906, TypeTree: 4149, Apply: 2973, DefDef: 2568, Literal: 1721, This: 1576, Block: 1396, ValDef: 632, AppliedTypeTree: 554, Super: 365, TypeApply: 364, New: 314, ApplyConstructor: 301, ClassDef: 270, TypeBoundsTree: 120, ModuleDef: 119, PackageDef: 119, : 102, If: 87, Assign: 78, Match: 73, Function: 70, SingletonTypeTree: 65, Throw: 48, ApplyImplicitView: 44, TypeDef: 29, Bind: 25, CompoundTypeTree: 23, ApplyToImplicitArgs: 19, Typed: 17, ExistentialTypeTree: 16, Try: 3, Alternative: 3, LabelDef: 3, Annotated: 3)
+[scalacfork] avg micros by tree node    : ArrayBuffer(ClassDef: 1800, ModuleDef: 1731, Block: 845, Apply: 742, Typed: 539, If: 421, ExistentialTypeTree: 401, Match: 390, Annotated: 371, ApplyConstructor: 333, Try: 324, LabelDef: 283, Alternative: 263, PackageDef: 236, Function: 201, DefDef: 193, AppliedTypeTree: 186, Select: 185, TypeApply: 141, ApplyToImplicitArgs: 133, Ident: 114, TypeDef: 112, CompoundTypeTree: 91, New: 85, ApplyImplicitView: 80, Bind: 57, ValDef: 49, Super: 29, Assign: 22, TypeBoundsTree: 22, This: 17, Literal: 14, SingletonTypeTree: 11, Throw: 11, : 3, TypeTree: 3)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 1139
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 62, 62, 53, 53
+[scalacfork] #implicit improves tests   : 113
+[scalacfork] #implicit improves cached  : 16
+[scalacfork] #implicit inscope hits     : 33
+[scalacfork] #implicit oftype hits      : 16
+[scalacfork] #macro expansions          : 8
+[scalacfork] #time spent in macroExpand : 8 spans, 345702284ns (4,3%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 132279
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 48564
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 9371, TypeTree: 9078, Apply: 7150, This: 4659, DefDef: 3740, Ident: 3014, ValDef: 2845, : 2540, Literal: 1470, Block: 1130, TypeApply: 988, New: 493, Template: 469, ClassDef: 469, Super: 436, If: 139, PackageDef: 119, Typed: 106, CaseDef: 100, Assign: 99, Throw: 56, Match: 22, ApplyToImplicitArgs: 18, ApplyImplicitView: 18, ApplyConstructor: 13, LabelDef: 11, ArrayValue: 4, ApplyDynamic: 3, Try: 3, Bind: 1)
+[scalacfork] #typechecked identifiers : 12239
+[scalacfork] #typechecked selections  : 14730
+[scalacfork] #typechecked applications: 10781
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 57943
+[scalacfork] #symbols                 : 144159
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 198817
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 99589
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 21793, TypeTree: 16505, Ident: 11654, Apply: 10931, This: 9210, DefDef: 7477, : 7096, ValDef: 6952, Literal: 2051, Block: 1325, Assign: 842, New: 626, Super: 563, TypeApply: 493, Template: 469, ClassDef: 469, If: 393, Throw: 169, ApplyConstructor: 142, PackageDef: 119, Typed: 109, CaseDef: 103, Match: 22, ApplyToImplicitArgs: 18, ApplyImplicitView: 18, ArrayValue: 13, LabelDef: 11, Try: 6, Return: 6, Bind: 4)
+[scalacfork] #typechecked identifiers : 16546
+[scalacfork] #typechecked selections  : 20451
+[scalacfork] #typechecked applications: 15562
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 65665
+[scalacfork] #symbols                 : 173716
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] warning: there were 1 deprecation warnings; re-run with -deprecation for details
+[scalacfork] one warning found
+[propertyfile] Creating new property file: C:\Projects\Kepler\build\quick\classes\library\library.properties
+[stopwatch] [quick.lib.timer: 2:41.831 sec]
+
+quick.newlibs:
+
+quick.libs:
+
+quick.newforkjoin:
+
+quick.forkjoin:
+
+quick.pre-comp:
+
+quick.comp:
+    [mkdir] Created dir: C:\Projects\Kepler\build\quick\classes\compiler
+[scalacfork] Compiling 505 files to C:\Projects\Kepler\build\quick\classes\compiler
+[scalacfork] Enabling statistics, measuring overhead = 70.9682ns to 446.1033ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 607050
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 1519607
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 757495
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 191914, Ident: 96576, TypeTree: 94194, Apply: 82522, This: 68809, ValDef: 37298, Literal: 34675, : 32568, DefDef: 27367, TypeApply: 15103, Block: 13646, CaseDef: 9812, If: 7530, Bind: 7403, Function: 4803, New: 4233, ApplyImplicitView: 3664, Match: 3326, Super: 2743, Template: 2709, ApplyToImplicitArgs: 2505, Assign: 2251, Import: 1815, ClassDef: 1768, Typed: 1744, ApplyConstructor: 1346, PackageDef: 1002, ModuleDef: 941, TypeDef: 838, Throw: 710, Try: 365, LabelDef: 357, UnApply: 355, Return: 338, Alternative: 239, BackQuotedIdent: 16, AppliedTypeTree: 7, Star: 3)
+[scalacfork] #typechecked identifiers : 233292
+[scalacfork] #typechecked selections  : 141145
+[scalacfork] #typechecked applications: 96681
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 798395
+[scalacfork] #symbols                 : 768087
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 44127551856ns (100,0%)
+[scalacfork] time classfilereading      : 884 spans, 1103504635ns (2,5%)
+[scalacfork] time spent in implicits    : 21391 spans, 12832726046ns (29,1%)
+[scalacfork]     successful in scope    : 12698 spans, 5560761234ns (12,6%)
+[scalacfork]         failed in scope    : 19388 spans, 2899398776ns (6,6%)
+[scalacfork]      successful of type    : 9935 spans, 3548374379ns (8,0%)
+[scalacfork]          failed of type    : 16142 spans, 463317532ns (1,0%)
+[scalacfork]        assembling parts    : 3009 spans, 636472584ns (1,4%)
+[scalacfork]               matchesPT    : 69826 spans, 2170544660ns (4,9%)
+[scalacfork] implicit cache hits        : 14062 (82,4%)
+[scalacfork] time spent in failed       : 153522 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 81024 spans, 39111961ns (0,1%)
+[scalacfork]        failed op=          : 48934 spans, 483946406ns (1,1%)
+[scalacfork] time spent ref scanning    : 9 spans, 764033ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Apply: 13748885, Select: 11470715, Ident: 7409359, DefDef: 1742463, ClassDef: 1304414, If: 1225834, Match: 992827, Literal: 935378, AppliedTypeTree: 773975, ApplyConstructor: 655341, Block: 652048, TypeApply: 518035, ModuleDef: 467511, ValDef: 375874, Function: 280998, New: 122227, This: 80399, ApplyToImplicitArgs: 80346, ApplyImplicitView: 78297, PackageDef: 65648, Typed: 62172, Bind: 60399, TypeTree: 45418, Assign: 29666, Super: 26925, Annotated: 19667, Try: 18977, ExistentialTypeTree: 18057, TypeBoundsTree: 14907, TypeDef: 13263, SelectFromTypeTree: 8506, Throw: 5942, LabelDef: 5470, SingletonTypeTree: 4802, CompoundTypeTree: 4541, AssignOrNamedArg: 3611, Return: 3281, BackQuotedIdent: 2465, Alternative: 2174, : 451, Star: 169)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 251308, Select: 176448, Apply: 89392, TypeTree: 54700, Literal: 43970, DefDef: 27377, Block: 19915, This: 17174, ValDef: 15894, AppliedTypeTree: 14725, If: 7639, Bind: 7426, Function: 6835, TypeApply: 6390, ApplyImplicitView: 6167, New: 4915, ApplyConstructor: 4832, Match: 3687, Assign: 3549, ApplyToImplicitArgs: 2779, Super: 2745, ClassDef: 1768, TypeBoundsTree: 1640, Typed: 1456, PackageDef: 1002, SingletonTypeTree: 993, ModuleDef: 941, : 892, Throw: 718, Annotated: 574, TypeDef: 413, Try: 370, LabelDef: 360, Return: 343, Alternative: 239, ExistentialTypeTree: 192, SelectFromTypeTree: 82, AssignOrNamedArg: 80, CompoundTypeTree: 63, BackQuotedIdent: 33, Star: 3)
+[scalacfork] avg micros by tree node    : ArrayBuffer(ClassDef: 737, ModuleDef: 496, Match: 269, If: 160, Apply: 153, ApplyConstructor: 135, SelectFromTypeTree: 103, ExistentialTypeTree: 94, TypeApply: 81, BackQuotedIdent: 74, CompoundTypeTree: 72, PackageDef: 65, Select: 65, DefDef: 63, Star: 56, AppliedTypeTree: 52, Try: 51, AssignOrNamedArg: 45, Typed: 42, Function: 41, Annotated: 34, Block: 32, TypeDef: 32, Ident: 29, ApplyToImplicitArgs: 28, New: 24, ValDef: 23, Literal: 21, LabelDef: 15, ApplyImplicitView: 12, Return: 9, Super: 9, Alternative: 9, TypeBoundsTree: 9, Assign: 8, Throw: 8, Bind: 8, SingletonTypeTree: 4, This: 4, TypeTree: 0, : 0)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 21391
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 6515, 6515, 6424, 6404
+[scalacfork] #implicit improves tests   : 15875
+[scalacfork] #implicit improves cached  : 13081
+[scalacfork] #implicit inscope hits     : 4006
+[scalacfork] #implicit oftype hits      : 2485
+[scalacfork] #macro expansions          : 314
+[scalacfork] #time spent in macroExpand : 314 spans, 828652786ns (1,9%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 3797624
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 1416991
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 299328, Apply: 246448, TypeTree: 224287, Ident: 120512, This: 106919, ValDef: 77196, DefDef: 65969, : 58493, Block: 46150, Literal: 42877, TypeApply: 34255, New: 18334, If: 15999, Template: 9758, ClassDef: 9758, Super: 9451, Typed: 7482, ApplyImplicitView: 3659, Assign: 3196, LabelDef: 2885, CaseDef: 2799, ApplyToImplicitArgs: 2497, ApplyConstructor: 2333, ArrayValue: 2091, Throw: 2066, PackageDef: 1002, Try: 400, Return: 300, Match: 296, Bind: 231, ApplyDynamic: 20)
+[scalacfork] #typechecked identifiers : 361723
+[scalacfork] #typechecked selections  : 457340
+[scalacfork] #typechecked applications: 407958
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 960941
+[scalacfork] #symbols                 : 1416974
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 4495206
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 1738967
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 387489, Apply: 265846, TypeTree: 254327, Ident: 165919, This: 133439, ValDef: 99965, : 89221, DefDef: 71240, Literal: 55677, Block: 51183, TypeApply: 31874, If: 23776, New: 23519, Assign: 19078, Super: 9992, Template: 9758, ClassDef: 9758, Typed: 7502, ApplyConstructor: 6881, Throw: 6601, ApplyImplicitView: 3296, LabelDef: 2885, CaseDef: 2819, ApplyToImplicitArgs: 2462, ArrayValue: 2151, PackageDef: 1002, Try: 420, Return: 340, Match: 296, Bind: 251)
+[scalacfork] #typechecked identifiers : 386583
+[scalacfork] #typechecked selections  : 510395
+[scalacfork] #typechecked applications: 437886
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 989045
+[scalacfork] #symbols                 : 1531026
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] warning: there were 159 deprecation warnings; re-run with -deprecation for details
+[scalacfork] warning: there were 21 unchecked warnings; re-run with -unchecked for details
+[scalacfork] two warnings found
+[propertyfile] Creating new property file: C:\Projects\Kepler\build\quick\classes\compiler\compiler.properties
+     [copy] Copying 57 files to C:\Projects\Kepler\build\quick\classes\compiler
+[stopwatch] [quick.comp.timer: 2:12.685 sec]
+
+quick.pre-plugins:
+
+quick.plugins:
+    [mkdir] Created dir: C:\Projects\Kepler\build\quick\classes\continuations-plugin
+[scalacfork] Compiling 5 files to C:\Projects\Kepler\build\quick\classes\continuations-plugin
+[scalacfork] Enabling statistics, measuring overhead = 42.27ns to 330.2061ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 8416
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 17348
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 9441
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 2261, Ident: 1647, TypeTree: 1158, Apply: 1147, This: 791, ValDef: 463, : 298, Bind: 285, Literal: 269, TypeApply: 252, Block: 160, CaseDef: 146, DefDef: 114, If: 84, Match: 72, Typed: 53, Function: 47, ApplyToImplicitArgs: 35, Import: 30, ApplyImplicitView: 27, Return: 23, Super: 15, New: 14, Template: 12, ClassDef: 10, Throw: 5, Assign: 5, PackageDef: 5, ApplyConstructor: 3, Try: 3, UnApply: 3, ModuleDef: 2, TypeDef: 1, Alternative: 1)
+[scalacfork] #typechecked identifiers : 2990
+[scalacfork] #typechecked selections  : 1607
+[scalacfork] #typechecked applications: 1293
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 14186
+[scalacfork] #symbols                 : 64785
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 3923906247ns (100,0%)
+[scalacfork] time classfilereading      : 284 spans, 582671071ns (14,8%)
+[scalacfork] time spent in implicits    : 94 spans, 834365534ns (21,3%)
+[scalacfork]     successful in scope    : 68 spans, 200174021ns (5,1%)
+[scalacfork]         failed in scope    : 72 spans, 163193365ns (4,2%)
+[scalacfork]      successful of type    : 38 spans, 445790810ns (11,4%)
+[scalacfork]          failed of type    : 38 spans, 7682890ns (0,2%)
+[scalacfork]        assembling parts    : 34 spans, 296019697ns (7,5%)
+[scalacfork]               matchesPT    : 612 spans, 84257100ns (2,1%)
+[scalacfork] implicit cache hits        : 17 (33,3%)
+[scalacfork] time spent in failed       : 1862 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 1048 spans, 0ns (0,0%)
+[scalacfork]        failed op=          : 646 spans, 0ns (0,0%)
+[scalacfork] time spent ref scanning    : 0 spans, 0ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Apply: 1406239, Select: 1117696, Ident: 982632, ClassDef: 61259, DefDef: 57419, ValDef: 47380, Match: 38954, AppliedTypeTree: 38011, Block: 35425, If: 25901, Function: 14288, ModuleDef: 13773, PackageDef: 10429, Literal: 9327, Bind: 7361, ApplyConstructor: 7248, ApplyToImplicitArgs: 6692, TypeApply: 5593, New: 5178, TypeTree: 4882, ApplyImplicitView: 4152, Annotated: 4120, This: 1707, TypeDef: 1562, Typed: 1461, Try: 1054, Super: 1022, Return: 673, Alternative: 581, Assign: 417, Throw: 187, SingletonTypeTree: 56, : 25)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 3332, Select: 1925, Apply: 1257, TypeTree: 517, Literal: 323, Bind: 285, ValDef: 283, Block: 201, AppliedTypeTree: 127, DefDef: 114, If: 85, Match: 74, This: 73, Function: 68, ApplyConstructor: 58, New: 58, ApplyImplicitView: 52, TypeApply: 45, Annotated: 44, ApplyToImplicitArgs: 43, Return: 23, Super: 15, Assign: 12, ClassDef: 10, Typed: 9, Throw: 5, PackageDef: 5, SingletonTypeTree: 3, Try: 3, : 2, ModuleDef: 2, TypeDef: 1, Alternative: 1)
+[scalacfork] avg micros by tree node    : ArrayBuffer(ModuleDef: 6886, ClassDef: 6125, PackageDef: 2085, TypeDef: 1562, Apply: 1118, Alternative: 581, Select: 580, Match: 526, DefDef: 503, Try: 351, If: 304, AppliedTypeTree: 299, Ident: 294, Function: 210, Block: 176, ValDef: 167, Typed: 162, ApplyToImplicitArgs: 155, ApplyConstructor: 124, TypeApply: 124, Annotated: 93, New: 89, ApplyImplicitView: 79, Super: 68, Throw: 37, Assign: 34, Return: 29, Literal: 28, Bind: 25, This: 23, SingletonTypeTree: 18, : 12, TypeTree: 9)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 94
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 70, 70, 70, 70
+[scalacfork] #implicit improves tests   : 224
+[scalacfork] #implicit improves cached  : 204
+[scalacfork] #implicit inscope hits     : 43
+[scalacfork] #implicit oftype hits      : 25
+[scalacfork] #macro expansions          : 0
+[scalacfork] #time spent in macroExpand : 0 spans, 0ns (0,0%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 51185
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 18833
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 4010, Apply: 3355, TypeTree: 3038, Ident: 1881, This: 1303, ValDef: 1146, DefDef: 636, Block: 611, TypeApply: 579, : 577, Literal: 424, New: 277, If: 233, Super: 122, ClassDef: 120, Template: 120, Typed: 109, Throw: 56, ArrayValue: 56, ApplyConstructor: 51, ApplyToImplicitArgs: 35, ApplyImplicitView: 27, LabelDef: 26, Return: 23, Assign: 6, PackageDef: 5, Try: 3, CaseDef: 2, Bind: 2)
+[scalacfork] #typechecked identifiers : 5195
+[scalacfork] #typechecked selections  : 6212
+[scalacfork] #typechecked applications: 5839
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 32567
+[scalacfork] #symbols                 : 100935
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 60342
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 24259
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 5545, Apply: 3794, TypeTree: 3424, Ident: 2409, This: 1902, ValDef: 1467, : 1026, Block: 805, Literal: 804, DefDef: 656, TypeApply: 575, If: 377, New: 328, Assign: 292, Super: 122, ClassDef: 120, Template: 120, Typed: 109, ApplyConstructor: 103, Throw: 102, ArrayValue: 56, ApplyToImplicitArgs: 35, ApplyImplicitView: 27, LabelDef: 26, Return: 23, PackageDef: 5, Try: 3, CaseDef: 2, Bind: 2)
+[scalacfork] #typechecked identifiers : 5484
+[scalacfork] #typechecked selections  : 7023
+[scalacfork] #typechecked applications: 6259
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 33603
+[scalacfork] #symbols                 : 105695
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+     [copy] Copying 1 file to C:\Projects\Kepler\build\quick\classes\continuations-plugin
+    [mkdir] Created dir: C:\Projects\Kepler\build\quick\misc\scala-devel\plugins
+      [jar] Building jar: C:\Projects\Kepler\build\quick\misc\scala-devel\plugins\continuations.jar
+[scalacfork] Compiling 2 files to C:\Projects\Kepler\build\quick\classes\library
+[scalacfork] Enabling statistics, measuring overhead = 42.4965ns to 330.0161ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 1687
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 3822
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 871
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 182, Select: 121, Ident: 99, Apply: 63, ValDef: 61, : 56, TypeDef: 39, Literal: 38, This: 34, DefDef: 27, Block: 25, TypeApply: 22, Function: 16, New: 13, CaseDef: 8, Bind: 8, Typed: 8, If: 8, Try: 8, Template: 7, Super: 7, ClassDef: 6, Assign: 6, Throw: 4, PackageDef: 3, Import: 1, ModuleDef: 1)
+[scalacfork] #typechecked identifiers : 510
+[scalacfork] #typechecked selections  : 466
+[scalacfork] #typechecked applications: 70
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 604
+[scalacfork] #symbols                 : 9983
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 435186358ns (100,0%)
+[scalacfork] time classfilereading      : 31 spans, 167898429ns (38,6%)
+[scalacfork] time spent in implicits    : 0 spans, 0ns (0,0%)
+[scalacfork]     successful in scope    : 0 spans, 0ns (0,0%)
+[scalacfork]         failed in scope    : 0 spans, 0ns (0,0%)
+[scalacfork]      successful of type    : 0 spans, 0ns (0,0%)
+[scalacfork]          failed of type    : 0 spans, 0ns (0,0%)
+[scalacfork]        assembling parts    : 0 spans, 0ns (0,0%)
+[scalacfork]               matchesPT    : 0 spans, 0ns (0,0%)
+[scalacfork] implicit cache hits        : 0
+[scalacfork] time spent in failed       : 291 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 54 spans, 0ns (0,0%)
+[scalacfork]        failed op=          : 35 spans, 0ns (0,0%)
+[scalacfork] time spent ref scanning    : 0 spans, 0ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Ident: 73163, ApplyConstructor: 70515, Select: 62808, Apply: 59539, ClassDef: 37435, DefDef: 36745, AppliedTypeTree: 33955, Block: 8830, Function: 8584, New: 7163, TypeApply: 6771, Try: 5862, Typed: 5441, ValDef: 4856, PackageDef: 4273, Annotated: 3291, Literal: 2770, TypeBoundsTree: 2698, ModuleDef: 2578, Throw: 930, TypeDef: 873, This: 859, Super: 841, If: 713, Bind: 531, TypeTree: 487, Assign: 308)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 687, Select: 512, AppliedTypeTree: 135, TypeBoundsTree: 74, Literal: 54, Apply: 51, TypeTree: 40, Block: 39, TypeApply: 29, New: 27, DefDef: 27, Function: 22, ApplyConstructor: 20, ValDef: 18, Annotated: 17, This: 11, Bind: 8, Typed: 8, If: 8, Try: 8, Super: 7, ClassDef: 6, Assign: 6, Throw: 4, PackageDef: 3, TypeDef: 2, ModuleDef: 1)
+[scalacfork] avg micros by tree node    : ArrayBuffer(ClassDef: 6239, ApplyConstructor: 3525, ModuleDef: 2578, PackageDef: 1424, DefDef: 1360, Apply: 1167, Try: 732, Typed: 680, TypeDef: 436, Function: 390, ValDef: 269, New: 265, AppliedTypeTree: 251, TypeApply: 233, Throw: 232, Block: 226, Annotated: 193, Select: 122, Super: 120, Ident: 106, If: 89, This: 78, Bind: 66, Literal: 51, Assign: 51, TypeBoundsTree: 36, TypeTree: 12)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 0
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 0, 0, 0, 0
+[scalacfork] #implicit improves tests   : 0
+[scalacfork] #implicit improves cached  : 0
+[scalacfork] #implicit inscope hits     : 0
+[scalacfork] #implicit oftype hits      : 0
+[scalacfork] #macro expansions          : 0
+[scalacfork] #time spent in macroExpand : 0 spans, 0ns (0,0%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 7239
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 1696
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 358, Select: 203, Apply: 188, Ident: 160, ValDef: 127, : 112, DefDef: 89, This: 85, Block: 83, Literal: 54, TypeApply: 49, New: 29, Template: 23, ClassDef: 23, Super: 23, Typed: 20, If: 18, LabelDef: 10, Throw: 9, CaseDef: 8, Bind: 8, Try: 8, Assign: 6, PackageDef: 3)
+[scalacfork] #typechecked identifiers : 708
+[scalacfork] #typechecked selections  : 662
+[scalacfork] #typechecked applications: 314
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 6505
+[scalacfork] #symbols                 : 26374
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 8306
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 1974
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 378, Select: 270, Ident: 191, Apply: 181, ValDef: 162, : 147, This: 128, Block: 83, DefDef: 76, Literal: 63, New: 43, Assign: 34, TypeApply: 33, If: 27, Template: 23, ClassDef: 23, Super: 23, Typed: 20, Throw: 18, ApplyConstructor: 14, LabelDef: 10, CaseDef: 8, Bind: 8, Try: 8, PackageDef: 3)
+[scalacfork] #typechecked identifiers : 745
+[scalacfork] #typechecked selections  : 730
+[scalacfork] #typechecked applications: 337
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 6902
+[scalacfork] #symbols                 : 28761
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[stopwatch] [quick.plugins.timer: 21.744 sec]
+
+quick.pre-scalacheck:
+
+quick.scalacheck:
+    [mkdir] Created dir: C:\Projects\Kepler\build\quick\classes\scalacheck
+[scalacfork] Compiling 14 files to C:\Projects\Kepler\build\quick\classes\scalacheck
+[scalacfork] Enabling statistics, measuring overhead = 59.8336ns to 466.7436ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 25351
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 68933
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 26444
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 5565, Select: 4296, Ident: 3623, Apply: 2131, ValDef: 1932, : 1831, This: 1495, TypeApply: 1147, DefDef: 896, Literal: 622, TypeDef: 470, Function: 414, ApplyToImplicitArgs: 349, Block: 279, CaseDef: 209, Typed: 152, Bind: 148, New: 119, Template: 117, Super: 100, Match: 84, ApplyConstructor: 82, If: 82, ClassDef: 80, ApplyImplicitView: 69, Import: 53, ModuleDef: 37, Throw: 23, Assign: 17, PackageDef: 14, LabelDef: 3, Try: 3, AppliedTypeTree: 2)
+[scalacfork] #typechecked identifiers : 10050
+[scalacfork] #typechecked selections  : 7452
+[scalacfork] #typechecked applications: 2808
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 80711
+[scalacfork] #symbols                 : 108774
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 8802029511ns (100,0%)
+[scalacfork] time classfilereading      : 333 spans, 631552756ns (7,2%)
+[scalacfork] time spent in implicits    : 1535 spans, 4630118195ns (52,6%)
+[scalacfork]     successful in scope    : 1062 spans, 2881545447ns (32,7%)
+[scalacfork]         failed in scope    : 1240 spans, 1374942667ns (15,6%)
+[scalacfork]      successful of type    : 546 spans, 1582650159ns (18,0%)
+[scalacfork]          failed of type    : 873 spans, 222515296ns (2,5%)
+[scalacfork]        assembling parts    : 644 spans, 472585525ns (5,4%)
+[scalacfork]               matchesPT    : 17295 spans, 448378223ns (5,1%)
+[scalacfork] implicit cache hits        : 298 (31,6%)
+[scalacfork] time spent in failed       : 5848 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 1992 spans, 0ns (0,0%)
+[scalacfork]        failed op=          : 1409 spans, 11869859ns (0,1%)
+[scalacfork] time spent ref scanning    : 0 spans, 0ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Apply: 4104770, Select: 1425321, Ident: 863564, TypeApply: 756207, ApplyConstructor: 448118, AppliedTypeTree: 285835, DefDef: 205683, ClassDef: 137477, Block: 125701, Function: 96886, ModuleDef: 55682, ApplyToImplicitArgs: 41573, Literal: 40478, Match: 36086, If: 35424, ValDef: 20950, TypeBoundsTree: 20185, TypeTree: 11414, This: 10070, ApplyImplicitView: 9790, PackageDef: 7899, New: 6598, Typed: 3921, Bind: 2940, ExistentialTypeTree: 2808, Super: 2520, Annotated: 1830, Try: 1111, AssignOrNamedArg: 782, LabelDef: 777, TypeDef: 651, Throw: 420, Assign: 247, : 75, SingletonTypeTree: 70)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 11743, Select: 9124, Apply: 2568, AppliedTypeTree: 2264, TypeTree: 2199, Literal: 1042, TypeBoundsTree: 934, DefDef: 896, Function: 736, This: 693, Block: 522, TypeApply: 467, ApplyToImplicitArgs: 423, ValDef: 240, Typed: 148, Bind: 148, New: 135, ApplyImplicitView: 135, ApplyConstructor: 129, Match: 101, Super: 100, If: 84, ClassDef: 80, ModuleDef: 37, Throw: 23, : 18, AssignOrNamedArg: 17, Assign: 15, PackageDef: 14, Annotated: 12, TypeDef: 10, SingletonTypeTree: 4, ExistentialTypeTree: 3, LabelDef: 3, Try: 3)
+[scalacfork] avg micros by tree node    : ArrayBuffer(ApplyConstructor: 3473, ClassDef: 1718, TypeApply: 1619, Apply: 1598, ModuleDef: 1504, ExistentialTypeTree: 936, PackageDef: 564, If: 421, Try: 370, Match: 357, LabelDef: 259, Block: 240, DefDef: 229, Select: 156, Annotated: 152, Function: 131, AppliedTypeTree: 126, ApplyToImplicitArgs: 98, ValDef: 87, Ident: 73, ApplyImplicitView: 72, TypeDef: 65, New: 48, AssignOrNamedArg: 46, Literal: 38, Typed: 26, Super: 25, TypeBoundsTree: 21, Bind: 19, Throw: 18, SingletonTypeTree: 17, Assign: 16, This: 14, TypeTree: 5, : 4)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 1535
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 1241, 1241, 1237, 797
+[scalacfork] #implicit improves tests   : 1363
+[scalacfork] #implicit improves cached  : 848
+[scalacfork] #implicit inscope hits     : 589
+[scalacfork] #implicit oftype hits      : 146
+[scalacfork] #macro expansions          : 4
+[scalacfork] #time spent in macroExpand : 4 spans, 262434235ns (3,0%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 164392
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 49982
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 10341, Select: 7752, Apply: 5826, Ident: 4433, ValDef: 3652, This: 3561, : 3232, DefDef: 3086, Block: 1702, Literal: 1175, New: 921, TypeApply: 683, Typed: 659, Template: 651, ClassDef: 651, Super: 624, ApplyToImplicitArgs: 349, If: 240, Throw: 83, ApplyConstructor: 81, ApplyImplicitView: 71, Assign: 63, CaseDef: 46, ArrayValue: 37, LabelDef: 18, ApplyDynamic: 15, PackageDef: 14, Match: 10, Try: 3, Bind: 3)
+[scalacfork] #typechecked identifiers : 14557
+[scalacfork] #typechecked selections  : 15293
+[scalacfork] #typechecked applications: 10681
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 104463
+[scalacfork] #symbols                 : 159630
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 207994
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 75917
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 14098, TypeTree: 13494, Ident: 7548, Apply: 7121, ValDef: 6308, This: 6219, : 6034, DefDef: 3212, Block: 1867, Literal: 1842, Assign: 1567, New: 1286, Typed: 674, TypeApply: 652, Template: 651, ClassDef: 651, Super: 624, If: 620, ApplyConstructor: 434, ApplyToImplicitArgs: 349, Throw: 344, ArrayValue: 82, ApplyImplicitView: 71, CaseDef: 61, Return: 30, LabelDef: 18, Try: 18, Bind: 18, PackageDef: 14, Match: 10)
+[scalacfork] #typechecked identifiers : 16673
+[scalacfork] #typechecked selections  : 18986
+[scalacfork] #typechecked applications: 12413
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 107833
+[scalacfork] #symbols                 : 171826
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] warning: there were 2 deprecation warnings; re-run with -deprecation for details
+[scalacfork] one warning found
+[stopwatch] [quick.scalacheck.timer: 25.552 sec]
+
+quick.pre-scalap:
+
+quick.scalap:
+    [mkdir] Created dir: C:\Projects\Kepler\build\quick\classes\scalap
+[scalacfork] Compiling 27 files to C:\Projects\Kepler\build\quick\classes\scalap
+[scalacfork] Enabling statistics, measuring overhead = 44.8267ns to 349.3259ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 23068
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 76248
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 35905
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 6819, Select: 6814, Ident: 3637, Apply: 3300, This: 3094, DefDef: 2014, ValDef: 1884, : 1794, Literal: 1582, TypeApply: 1135, Block: 525, CaseDef: 435, TypeDef: 370, New: 259, Function: 255, Bind: 233, If: 218, Template: 208, ApplyConstructor: 205, Super: 174, Match: 170, ApplyImplicitView: 159, ClassDef: 126, ApplyToImplicitArgs: 83, ModuleDef: 82, Throw: 73, Typed: 69, PackageDef: 68, Assign: 44, Import: 44, LabelDef: 18, Return: 5, Try: 4, AppliedTypeTree: 3, Alternative: 2)
+[scalacfork] #typechecked identifiers : 9903
+[scalacfork] #typechecked selections  : 7731
+[scalacfork] #typechecked applications: 3986
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 38976
+[scalacfork] #symbols                 : 67314
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 7641918502ns (100,0%)
+[scalacfork] time classfilereading      : 330 spans, 644707781ns (8,4%)
+[scalacfork] time spent in implicits    : 1032 spans, 2318658232ns (30,3%)
+[scalacfork]     successful in scope    : 623 spans, 1127973027ns (14,8%)
+[scalacfork]         failed in scope    : 925 spans, 439677793ns (5,8%)
+[scalacfork]      successful of type    : 425 spans, 636196625ns (8,3%)
+[scalacfork]          failed of type    : 802 spans, 27698223ns (0,4%)
+[scalacfork]        assembling parts    : 90 spans, 167641090ns (2,2%)
+[scalacfork]               matchesPT    : 1597 spans, 220553167ns (2,9%)
+[scalacfork] implicit cache hits        : 722 (88,9%)
+[scalacfork] time spent in failed       : 7109 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 3127 spans, 13272484ns (0,2%)
+[scalacfork]        failed op=          : 2014 spans, 82212089ns (1,1%)
+[scalacfork] time spent ref scanning    : 0 spans, 0ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Select: 2665822, Apply: 2307394, Ident: 968686, DefDef: 323985, ClassDef: 259626, AppliedTypeTree: 181191, If: 137016, ApplyConstructor: 105328, Match: 100700, ModuleDef: 97403, Block: 94925, Function: 53712, ValDef: 46216, TypeApply: 39915, Literal: 39593, This: 29756, New: 20543, PackageDef: 17027, TypeTree: 15882, ApplyImplicitView: 15020, TypeBoundsTree: 14795, Typed: 12851, TypeDef: 11269, ApplyToImplicitArgs: 8497, Bind: 5822, ExistentialTypeTree: 4749, SelectFromTypeTree: 3685, Super: 3265, Annotated: 1902, CompoundTypeTree: 1816, LabelDef: 1291, Throw: 993, Assign: 961, Try: 756, Alternative: 594, : 148, Return: 126, SingletonTypeTree: 117)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 11489, Select: 10279, TypeTree: 3972, Apply: 3658, Literal: 2403, DefDef: 2017, AppliedTypeTree: 1513, This: 1364, Block: 962, TypeBoundsTree: 724, ValDef: 584, TypeApply: 522, Function: 382, ApplyImplicitView: 315, New: 280, ApplyConstructor: 277, Bind: 238, If: 222, Match: 194, Super: 174, ClassDef: 126, ApplyToImplicitArgs: 102, ModuleDef: 82, Throw: 73, PackageDef: 68, Typed: 53, Assign: 46, : 43, TypeDef: 30, SelectFromTypeTree: 25, Annotated: 18, LabelDef: 18, CompoundTypeTree: 9, SingletonTypeTree: 6, Return: 5, ExistentialTypeTree: 4, Try: 4, Alternative: 2)
+[scalacfork] avg micros by tree node    : ArrayBuffer(ClassDef: 2060, ModuleDef: 1187, ExistentialTypeTree: 1187, Apply: 630, If: 617, Match: 519, ApplyConstructor: 380, TypeDef: 375, Alternative: 297, Select: 259, PackageDef: 250, Typed: 242, CompoundTypeTree: 201, Try: 189, DefDef: 160, SelectFromTypeTree: 147, Function: 140, AppliedTypeTree: 119, Annotated: 105, Block: 98, Ident: 84, ApplyToImplicitArgs: 83, ValDef: 79, TypeApply: 76, New: 73, LabelDef: 71, ApplyImplicitView: 47, Return: 25, Bind: 24, This: 21, Assign: 20, TypeBoundsTree: 20, SingletonTypeTree: 19, Super: 18, Literal: 16, Throw: 13, TypeTree: 3, : 3)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 1032
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 254, 254, 252, 252
+[scalacfork] #implicit improves tests   : 278
+[scalacfork] #implicit improves cached  : 168
+[scalacfork] #implicit inscope hits     : 214
+[scalacfork] #implicit oftype hits      : 32
+[scalacfork] #macro expansions          : 6
+[scalacfork] #time spent in macroExpand : 6 spans, 345140853ns (4,5%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 167741
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 59626
+[scalacfork] #retained nodes by type  : ArrayBuffer(TypeTree: 11179, Select: 10526, Apply: 8458, This: 4873, Ident: 4516, DefDef: 3909, ValDef: 3437, : 2910, Literal: 2028, Block: 2014, TypeApply: 1093, New: 969, Template: 628, ClassDef: 628, Super: 568, If: 454, Typed: 444, CaseDef: 181, Throw: 163, ApplyImplicitView: 159, ApplyConstructor: 123, Assign: 96, ApplyToImplicitArgs: 83, PackageDef: 68, LabelDef: 50, Match: 40, ArrayValue: 11, ApplyDynamic: 7, Return: 5, Try: 4, Bind: 2)
+[scalacfork] #typechecked identifiers : 14462
+[scalacfork] #typechecked selections  : 18076
+[scalacfork] #typechecked applications: 14349
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 65531
+[scalacfork] #symbols                 : 124157
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 206821
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 82626
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 17374, TypeTree: 13851, Apply: 10025, Ident: 8164, This: 6711, ValDef: 5099, DefDef: 4983, : 4804, Literal: 2486, Block: 2156, New: 1136, TypeApply: 909, Assign: 741, If: 689, Template: 628, ClassDef: 628, Super: 568, Typed: 451, Throw: 285, ApplyConstructor: 279, CaseDef: 188, ApplyImplicitView: 159, ApplyToImplicitArgs: 83, PackageDef: 68, LabelDef: 50, Match: 40, ArrayValue: 32, Return: 19, Try: 11, Bind: 9)
+[scalacfork] #typechecked identifiers : 16277
+[scalacfork] #typechecked selections  : 20879
+[scalacfork] #typechecked applications: 16389
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 72100
+[scalacfork] #symbols                 : 137733
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[stopwatch] [quick.scalap.timer: 25.792 sec]
+
+quick.pre-partest:
+
+quick.partest:
+    [mkdir] Created dir: C:\Projects\Kepler\build\quick\classes\partest
+    [javac] Compiling 2 source files to C:\Projects\Kepler\build\quick\classes\partest
+[scalacfork] Compiling 27 files to C:\Projects\Kepler\build\quick\classes\partest
+[scalacfork] Enabling statistics, measuring overhead = 77.8077ns to 594.4623ns per timer
+[scalacfork] *** Cumulative statistics at phase parser
+[scalacfork] #created tree nodes  : 18397
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] *** Cumulative statistics at phase typer
+[scalacfork] #created tree nodes  : 56068
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 27254
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 6778, TypeTree: 3782, Ident: 3346, Apply: 2841, This: 2079, ValDef: 1533, Literal: 1287, : 1169, DefDef: 1031, TypeApply: 774, Block: 422, ApplyImplicitView: 285, Function: 252, ApplyToImplicitArgs: 194, New: 190, CaseDef: 189, If: 144, Import: 131, Assign: 113, Bind: 107, Template: 94, Super: 90, Match: 76, ApplyConstructor: 76, ClassDef: 58, Typed: 50, PackageDef: 46, ModuleDef: 36, Throw: 22, Try: 22, TypeDef: 20, UnApply: 6, Star: 4, Alternative: 3, Return: 3, BackQuotedIdent: 1)
+[scalacfork] #typechecked identifiers : 7158
+[scalacfork] #typechecked selections  : 5648
+[scalacfork] #typechecked applications: 4030
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 66883
+[scalacfork] #symbols                 : 119333
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] time spent typechecking    : 1 spans, 9281384122ns (100,0%)
+[scalacfork] time classfilereading      : 572 spans, 983214501ns (10,6%)
+[scalacfork] time spent in implicits    : 1171 spans, 4235400394ns (45,6%)
+[scalacfork]     successful in scope    : 735 spans, 1993626991ns (21,5%)
+[scalacfork]         failed in scope    : 1021 spans, 653393044ns (7,0%)
+[scalacfork]      successful of type    : 600 spans, 1507868959ns (16,2%)
+[scalacfork]          failed of type    : 708 spans, 27359179ns (0,3%)
+[scalacfork]        assembling parts    : 245 spans, 348246396ns (3,8%)
+[scalacfork]               matchesPT    : 5119 spans, 493924048ns (5,3%)
+[scalacfork] implicit cache hits        : 539 (68,8%)
+[scalacfork] time spent in failed       : 6216 spans, 0ns (0,0%)
+[scalacfork]        failed apply        : 3289 spans, 78095819ns (0,8%)
+[scalacfork]        failed op=          : 2019 spans, 16872176ns (0,2%)
+[scalacfork] time spent ref scanning    : 1 spans, 554968ns (0,0%)
+[scalacfork] micros by tree node        : ArrayBuffer(Select: 3595983, Apply: 3026955, Ident: 966698, Typed: 266300, DefDef: 223268, ClassDef: 174977, ApplyConstructor: 161417, Literal: 149829, Block: 116763, AppliedTypeTree: 103632, ValDef: 73840, Function: 59390, TypeApply: 58757, If: 45261, ApplyToImplicitArgs: 44265, Match: 38275, ModuleDef: 35560, ApplyImplicitView: 31439, PackageDef: 23800, TypeTree: 16567, New: 8323, This: 7806, Assign: 6409, ExistentialTypeTree: 4527, Try: 3660, Bind: 2612, Super: 2496, Annotated: 2136, SingletonTypeTree: 1723, TypeBoundsTree: 1378, Alternative: 566, Throw: 503, TypeDef: 404, BackQuotedIdent: 199, Return: 117, Star: 101, : 94)
+[scalacfork] #visits by tree node       : ArrayBuffer(Ident: 8151, Select: 7817, Apply: 3487, TypeTree: 2624, Literal: 1826, DefDef: 1031, Block: 745, This: 720, ValDef: 632, AppliedTypeTree: 587, TypeApply: 553, ApplyImplicitView: 450, Function: 347, ApplyToImplicitArgs: 264, Assign: 258, ApplyConstructor: 211, New: 211, If: 144, Bind: 107, Super: 90, Match: 88, SingletonTypeTree: 82, ClassDef: 58, PackageDef: 46, TypeBoundsTree: 41, ModuleDef: 36, Typed: 31, : 31, Try: 24, Throw: 22, Annotated: 21, Star: 4, Alternative: 3, Return: 3, TypeDef: 3, ExistentialTypeTree: 2, BackQuotedIdent: 1)
+[scalacfork] avg micros by tree node    : ArrayBuffer(Typed: 8590, ClassDef: 3016, ExistentialTypeTree: 2263, ModuleDef: 987, Apply: 868, ApplyConstructor: 765, PackageDef: 517, Select: 460, Match: 434, If: 314, DefDef: 216, BackQuotedIdent: 199, Alternative: 188, AppliedTypeTree: 176, Function: 171, ApplyToImplicitArgs: 167, Block: 156, Try: 152, TypeDef: 134, Ident: 118, ValDef: 116, TypeApply: 106, Annotated: 101, Literal: 82, ApplyImplicitView: 69, Return: 39, New: 39, TypeBoundsTree: 33, Super: 27, Star: 25, Bind: 24, Assign: 24, Throw: 22, SingletonTypeTree: 21, This: 10, TypeTree: 6, : 3)
+[scalacfork] time spent in <:<          : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in findmember   : 0 spans, 0ns (0,0%)
+[scalacfork] time spent in asSeenFrom   : 0 spans, 0ns (0,0%)
+[scalacfork] #implicit searches         : 1171
+[scalacfork] #tried, plausible, matching, typed, found implicits: 0, 547, 547, 547, 547
+[scalacfork] #implicit improves tests   : 980
+[scalacfork] #implicit improves cached  : 622
+[scalacfork] #implicit inscope hits     : 299
+[scalacfork] #implicit oftype hits      : 328
+[scalacfork] #macro expansions          : 88
+[scalacfork] #time spent in macroExpand : 88 spans, 606015473ns (6,5%)
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase erasure
+[scalacfork] #created tree nodes  : 125102
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 47251
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 9710, TypeTree: 8200, Apply: 6795, Ident: 3910, This: 3538, ValDef: 2764, DefDef: 2440, : 2201, Literal: 1688, Block: 1366, TypeApply: 1089, New: 721, Template: 393, ClassDef: 393, Super: 383, Typed: 322, If: 287, ApplyImplicitView: 285, ApplyToImplicitArgs: 194, Assign: 133, ArrayValue: 100, ApplyConstructor: 84, CaseDef: 74, Throw: 58, PackageDef: 46, LabelDef: 22, Try: 22, Match: 18, Bind: 12, Return: 3)
+[scalacfork] #typechecked identifiers : 11090
+[scalacfork] #typechecked selections  : 14782
+[scalacfork] #typechecked applications: 12577
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 92940
+[scalacfork] #symbols                 : 189100
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] *** Cumulative statistics at phase cleanup
+[scalacfork] #created tree nodes  : 143437
+[scalacfork] #created tree nodes by type: ArrayBuffer()
+[scalacfork] #retained nodes          : 54133
+[scalacfork] #retained nodes by type  : ArrayBuffer(Select: 11646, TypeTree: 8730, Apply: 7184, Ident: 4878, This: 4257, ValDef: 3261, : 2854, DefDef: 2485, Literal: 1981, Block: 1449, TypeApply: 978, New: 832, Assign: 579, If: 446, Template: 394, ClassDef: 394, Super: 384, Typed: 322, ApplyImplicitView: 285, ApplyToImplicitArgs: 189, Throw: 159, ApplyConstructor: 149, ArrayValue: 100, CaseDef: 74, PackageDef: 46, LabelDef: 22, Try: 22, Match: 18, Bind: 12, Return: 3)
+[scalacfork] #typechecked identifiers : 11728
+[scalacfork] #typechecked selections  : 16054
+[scalacfork] #typechecked applications: 13187
+[scalacfork] #raw type creations      : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #unique types            : 95771
+[scalacfork] #symbols                 : 200725
+[scalacfork]   of which type symbols  : 0
+[scalacfork]   of which class symbols : 0
+[scalacfork] #base type seqs          : 0
+[scalacfork] avg base type seq length : NaN
+[scalacfork] #singleton base type seqs: 0
+[scalacfork] #compound base type seqs : 0
+[scalacfork] #typeref base type seqs  : 0
+[scalacfork] #findMember ops          : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork] #notfound member         : 0
+[scalacfork] #multiple member         : 0
+[scalacfork] #asSeenFrom ops          : 0
+[scalacfork] #subtype                 : 0
+[scalacfork]   of which in failed     : 0
+[scalacfork]   of which in implicits  : 0
+[scalacfork]   of which in app impl   : 0
+[scalacfork]   of which in improv     : 0
+[scalacfork] #sametype                : 0
+[scalacfork] ms type-flow-analysis: 0
+[scalacfork] #ctr1                    : 0
+[scalacfork] #ctr2                    : 0
+[scalacfork] #ctr3                    : 0
+[scalacfork] #ctr4                    : 0
+[scalacfork] #counter1                : 0
+[scalacfork] #counter2                : 0
+[scalacfork] #timer1                  : 0 spans, 0ns
+[scalacfork] #timer2                  : 0 spans, 0ns
+[scalacfork] warning: there were 11 deprecation warnings; re-run with -deprecation for details
+[scalacfork] one warning found
+[propertyfile] Creating new property file: C:\Projects\Kepler\build\quick\classes\partest\partest.properties
+     [copy] Copying 1 file to C:\Projects\Kepler\build\quick\classes\partest
+[stopwatch] [quick.partest.timer: 26.166 sec]
+
+quick.pre-bin:
+
+quick.bin:
+    [mkdir] Created dir: C:\Projects\Kepler\build\quick\bin
+
+quick.done:
+
+pack.start:
+
+pack.pre-lib:
+
+pack.lib:
+    [mkdir] Created dir: C:\Projects\Kepler\build\pack\lib
+     [copy] Copying 1 file to C:\Projects\Kepler\build\pack\lib
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scala-library.jar
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scala-dbc.jar
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scala-swing.jar
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scala-actors.jar
+
+pack.pre-comp:
+
+pack.comp:
+    [mkdir] Created dir: C:\Projects\Kepler\build\pack\META-INF
+     [copy] Copying 1 file to C:\Projects\Kepler\build\pack\META-INF
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scala-compiler.jar
+     [copy] Copying 1 file to C:\Projects\Kepler\build\pack\lib
+
+pack.pre-plugins:
+
+pack.plugins:
+    [mkdir] Created dir: C:\Projects\Kepler\build\pack\misc\scala-devel\plugins
+      [jar] Building jar: C:\Projects\Kepler\build\pack\misc\scala-devel\plugins\continuations.jar
+
+pack.scalacheck:
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scalacheck.jar
+
+pack.pre-partest:
+
+pack.partest:
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scala-partest.jar
+
+pack.pre-scalap:
+
+pack.scalap:
+      [jar] Building jar: C:\Projects\Kepler\build\pack\lib\scalap.jar
+
+pack.pre-bin:
+
+pack.bin:
+    [mkdir] Created dir: C:\Projects\Kepler\build\pack\bin
+
+pack.done:
+
+build:
+
+BUILD SUCCESSFUL
+Total time: 6 minutes 43 seconds
