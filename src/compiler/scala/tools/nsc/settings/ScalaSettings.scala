@@ -177,6 +177,7 @@ trait ScalaSettings extends AbsScalaSettings
 
   val exposeEmptyPackage = BooleanSetting("-Yexpose-empty-package", "Internal only: expose the empty package.").internalOnly()
   val Ysourcepath     = PathSetting ("-Ysourcepath", "[Only used when bootstrapping the scala library] Indicates the path to the scala library source code so the code generated is stand-alone rather than referencing the previous library classes.", "") // Defaults.scalaSourcePath
+  def sourcepath      = Ysourcepath 
 
   // this should be defined StandardScalaSettings, but there we don't have withDeprecationMessage and withPostSetHook
   // see StandardScalaSettings.sourcepath for more information
