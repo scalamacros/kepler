@@ -772,7 +772,7 @@ trait Definitions extends api.StandardDefinitions {
 
         existentialAbstraction(
           eparams,
-          ClassType(eparams.head setInfo TypeBounds.upper(upperBound) tpe)
+          ClassType((eparams.head setInfo TypeBounds.upper(upperBound)).tpe)
         )
       }
     }
