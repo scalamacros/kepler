@@ -14,7 +14,7 @@ import Flags._
 trait Symbols extends api.Symbols { self: SymbolTable =>
   import definitions._
 
-  protected var ids = 0
+  protected var ids = 0  
 
   val emptySymbolArray = new Array[Symbol](0)
 

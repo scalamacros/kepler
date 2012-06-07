@@ -860,12 +860,14 @@ QUICK BUILD (QUICK)
 
 
   <target name="quick.pre-reflect" depends="quick.lib">
-    <condition property="quick.reflect.needed">
-      <not><available file="${build-quick.dir}/reflect.complete"/></not>
-    </condition>
+    <uptodate property="quick.reflect.available" targetfile="${build-quick.dir}/reflect.complete">
+      <srcfiles dir="${src.dir}">
+        <include name="reflect/**"/>
+      </srcfiles>
+    </uptodate>
   </target>
 
-  <target name="quick.reflect" depends="quick.pre-reflect" if="quick.reflect.needed">
+  <target name="quick.reflect" depends="quick.pre-reflect" unless="quick.reflect.available">
     <stopwatch name="quick.reflect.timer"/>
     <mkdir dir="${build-quick.dir}/classes/reflect"/>
     <scalacfork
@@ -1936,7 +1938,7 @@ DOCUMENTATION
       docfooter="epfl"
       docsourceurl="${scaladoc.url}€{FILE_PATH}.scala#L1"
       docUncompilable="${src.dir}/library-aux"
-      docSourcePath="${src.dir}"
+      sourcepath="${src.dir}"
       classpathref="pack.classpath"
       addparams="${scalac.args.all}"
       docRootContent="${src.dir}/library/rootdoc.txt"
@@ -2018,7 +2020,7 @@ DOCUMENTATION
       doctitle="Scala Compiler"
       docversion="${version.number}"
       docsourceurl="${scaladoc.url}€{FILE_PATH}.scala#L1"
-      docSourcePath="${src.dir}"
+      sourcepath="${src.dir}"
       classpathref="pack.classpath"
       srcdir="${src.dir}/compiler"
       docRootContent="${src.dir}/compiler/rootdoc.txt"
@@ -2041,7 +2043,7 @@ DOCUMENTATION
       destdir="${build-docs.dir}/jline"
       doctitle="Scala JLine"
       docversion="${version.number}"
-      docSourcePath="${src.dir}"
+      sourcepath="${src.dir}"
       classpathref="pack.classpath"
       srcdir="${src.dir}/jline/src/main/java"
       addparams="${scalac.args.all}"
@@ -2065,7 +2067,7 @@ DOCUMENTATION
       doctitle="Scalap"
       docversion="${version.number}"
       docsourceurl="${scaladoc.url}€{FILE_PATH}.scala#L1"
-      docSourcePath="${src.dir}"
+      sourcepath="${src.dir}"
       classpathref="pack.classpath"
       srcdir="${src.dir}/scalap"
       addparams="${scalac.args.all}"
@@ -2087,7 +2089,7 @@ DOCUMENTATION
       destdir="${build-docs.dir}/scala-partest"
       doctitle="Scala Parallel Testing Framework"
       docversion="${version.number}"
-      docSourcePath="${src.dir}"
+      sourcepath="${src.dir}"
       classpathref="pack.classpath"
       srcdir="${src.dir}/partest"
       addparams="${scalac.args.all}"
@@ -2109,7 +2111,7 @@ DOCUMENTATION
       destdir="${build-docs.dir}/continuations-plugin"
       doctitle="Delimited Continuations Compiler Plugin"
       docversion="${version.number}"
-      docSourcePath="${src.dir}"
+      sourcepath="${src.dir}"
       classpathref="pack.classpath"
       srcdir="${src.dir}/continuations/plugin"
       addparams="${scalac.args.all}"
@@ -2131,7 +2133,7 @@ DOCUMENTATION
       destdir="${build-docs.dir}/actors-migration"
       doctitle="Actors Migration Kit"
       docversion="${version.number}"
-      docSourcePath="${src.dir}"
+      sourcepath="${src.dir}"
       classpathref="pack.classpath"
       srcdir="${src.dir}/actors-migration"
       addparams="${scalac.args.all}"
