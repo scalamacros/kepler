@@ -68,6 +68,8 @@ class Settings(error: String => Unit) extends scala.tools.nsc.Settings(error) {
     "The prefix in all source file paths. Will be stripped off all paths before URLs are generated.",
     ""
   )
+  // patching things so they maintain compatibility with existing tools 
+  override def sourcepath = docSourcePath
 
   /** A setting that defines a URL to be concatenated with source locations and show a link to source files.
    * If needed the docSourcePath option can be used to exclude undesired initial part of the link to sources */

@@ -63,6 +63,7 @@ trait Mirrors { self: Universe =>
     def get: Any
 
     /** Updates  the value stored in the field */
+    // TODO-2.10 Dominik which exception is thrown for val fields?
     def set(value: Any): Unit
   }
 
@@ -86,7 +87,7 @@ trait Mirrors { self: Universe =>
     def runtimeClass: RuntimeClass
 
     /** True if the mirror represents the static part
-     *  if a runtime class or the companion object of a Scala class.
+     *  of a runtime class or the companion object of a Scala class.
      *  One has:
      *
      *    this.isStatic == this.isInstanceOf[ModuleMirror]
@@ -130,7 +131,7 @@ trait Mirrors { self: Universe =>
      *  Otherwise, if the mirror represents the static part of a runtime class, the
      *  mirror representing the instance part of the same class.
      */
-    def companion: Option[ClassMirror]
+    override def companion: Option[ClassMirror]
   }
 
   /** A mirror that reflects the instance parts of a runtime class */
@@ -154,7 +155,7 @@ trait Mirrors { self: Universe =>
      *  Otherwise, if the mirror represents a runtime instance class, a mirror representing the static
      *  part of the same class.
      */
-    def companion: Option[ModuleMirror]
+    override def companion: Option[ModuleMirror]
   }
 
   /** The API of a mirror for a reflective universe */
