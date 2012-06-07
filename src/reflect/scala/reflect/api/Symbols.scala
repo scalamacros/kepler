@@ -173,7 +173,7 @@ trait Symbols extends base.Symbols { self: Universe =>
      */
     def isFreeType     : Boolean
 
-   /** Does this symbol or its underlying type represent a typechecking error?
+    /** Does this symbol or its underlying type represent a typechecking error?
      */
     def isErroneous : Boolean
 
@@ -200,6 +200,8 @@ trait Symbols extends base.Symbols { self: Universe =>
   }
 
   /** The API of type symbols */
+  // TODO-2.10 Dominik explicit declaration of HasFlagsApi would not be necessary, 
+  //                   as it is already inherited by SymbolApi
   trait TypeSymbolApi extends SymbolApi with HasFlagsApi with TypeSymbolBase { this: TypeSymbol =>
     /** Is the type parameter represented by this symbol contravariant?
      */
@@ -235,9 +237,12 @@ trait Symbols extends base.Symbols { self: Universe =>
   }
 
   /** The API of method symbols */
+  // TODO-2.10 Dominik should MethodSymbolApi not also extend HasFlagsApi (or simply extend
+  //                   SymbolApi)? MethodSymbol has it (as it is defined to extend TermSymbol).
   type MethodSymbolApi = MethodSymbolBase
 
   /** The API of module symbols */
+  // TODO-2.10 Dominik should ModuleSymbolApi not extend SymbolApi?
   type ModuleSymbolApi = ModuleSymbolBase
 
   /** The API of class symbols */
