@@ -966,12 +966,21 @@ trait Typers extends Modes with Adaptations with Tags {
        * see test/files/../t5189*.scala
        */
       def adaptConstrPattern(): Tree = { // (5)
-        def isExtractor(sym: Symbol) = reallyExists(unapplyMember(sym.tpe))
-        val extractor = tree.symbol filter isExtractor
+        def hasUnapplyMember(tp: Type) = reallyExists(unapplyMember(tp))
+        val overloadedExtractorOfObject = tree.symbol filter (sym => hasUnapplyMember(sym.tpe))
+        // if the tree's symbol's type does not define an extractor, maybe the tree's type does
+        // this is the case when we encounter an arbitrary tree as the target of an unapply call (rather than something that looks like a constructor call)
+        // (for now, this only happens due to wrapClassTagUnapply, but when we support parameterized extractors, it will become more common place)
+        val extractor = overloadedExtractorOfObject orElse unapplyMember(tree.tpe)
         if (extractor != NoSymbol) {
-          tree setSymbol extractor
+          // if we did some ad-hoc overloading resolution, update the tree's symbol
+          // do not update the symbol if the tree's symbol's type does not define an unapply member
+          // (e.g. since it's some method that returns an object with an unapply member)
+          if (overloadedExtractorOfObject != NoSymbol)
+            tree setSymbol overloadedExtractorOfObject
+
           tree.tpe match {
-            case OverloadedType(pre, alts) => tree.tpe = overloadedType(pre, alts filter isExtractor)
+            case OverloadedType(pre, alts) => tree.tpe = overloadedType(pre, alts filter (alt => hasUnapplyMember(alt.tpe)))
             case _ =>
           }
           val unapply = unapplyMember(extractor.tpe)
@@ -3041,72 +3050,132 @@ trait Typers extends Modes with Adaptations with Tags {
         case ErrorType =>
           if (!tree.isErrorTyped) setError(tree) else tree
           // @H change to setError(treeCopy.Apply(tree, fun, args))
-        /* --- begin unapply  --- */
 
         case otpe if inPatternMode(mode) && unapplyMember(otpe).exists =>
-          if (args.length > MaxTupleArity)
-            return duplErrorTree(TooManyArgsPatternError(fun))
+          doTypedUnapply(tree, fun0, fun, args, mode, pt)
 
-          //
-          def freshArgType(tp: Type): (List[Symbol], Type) = tp match {
-            case MethodType(param :: _, _) =>
-              (Nil, param.tpe)
-            case PolyType(tparams, restpe) =>
-              createFromClonedSymbols(tparams, freshArgType(restpe)._2)((ps, t) => ((ps, t)))
-            // No longer used, see test case neg/t960.scala (#960 has nothing to do with it)
-            case OverloadedType(_, _) =>
-              OverloadedUnapplyError(fun)
-              (Nil, ErrorType)
-            case _ =>
-              UnapplyWithSingleArgError(fun)
-              (Nil, ErrorType)
-          }
-
-          val unapp     = unapplyMember(otpe)
-          val unappType = otpe.memberType(unapp)
-          val argDummy  = context.owner.newValue(nme.SELECTOR_DUMMY, fun.pos, SYNTHETIC) setInfo pt
-          val arg       = Ident(argDummy) setType pt
-
-          if (!isApplicableSafe(Nil, unappType, List(pt), WildcardType)) {
-            //Console.println("UNAPP: need to typetest, arg.tpe = "+arg.tpe+", unappType = "+unappType)
-            val (freeVars, unappFormal) = freshArgType(unappType.skolemizeExistential(context.owner, tree))
-            val unapplyContext = context.makeNewScope(context.tree, context.owner)
-            freeVars foreach unapplyContext.scope.enter
-
-            val typer1 = newTyper(unapplyContext)
-            val pattp  = typer1.infer.inferTypedPattern(tree, unappFormal, arg.tpe)
-
-            // turn any unresolved type variables in freevars into existential skolems
-            val skolems = freeVars map (fv => unapplyContext.owner.newExistentialSkolem(fv, fv))
-            arg.tpe = pattp.substSym(freeVars, skolems)
-            argDummy setInfo arg.tpe
-          }
-
-          // setType null is necessary so that ref will be stabilized; see bug 881
-          val fun1 = typedPos(fun.pos)(Apply(Select(fun setType null, unapp), List(arg)))
-
-          if (fun1.tpe.isErroneous) {
-            duplErrTree
-          } else {
-            val formals0 = unapplyTypeList(fun1.symbol, fun1.tpe)
-            val formals1 = formalTypes(formals0, args.length)
-            if (sameLength(formals1, args)) {
-              val args1 = typedArgs(args, mode, formals0, formals1)
-              // This used to be the following (failing) assert:
-              //   assert(isFullyDefined(pt), tree+" ==> "+UnApply(fun1, args1)+", pt = "+pt)
-              // I modified as follows.  See SI-1048.
-              val pt1 = if (isFullyDefined(pt)) pt else makeFullyDefined(pt)
-
-              val itype = glb(List(pt1, arg.tpe))
-              arg.tpe = pt1    // restore type (arg is a dummy tree, just needs to pass typechecking)
-              UnApply(fun1, args1) setPos tree.pos setType itype
-            } else
-              duplErrorTree(WrongNumberArgsPatternError(tree, fun))
-          }
-
-/* --- end unapply  --- */
         case _ =>
           duplErrorTree(ApplyWithoutArgsError(tree, fun))
+      }
+    }
+
+    def doTypedUnapply(tree: Tree, fun0: Tree, fun: Tree, args: List[Tree], mode: Int, pt: Type): Tree = {
+      def duplErrTree = setError(treeCopy.Apply(tree, fun0, args))
+      def duplErrorTree(err: AbsTypeError) = { issue(err); duplErrTree }
+
+      val otpe = fun.tpe
+
+      if (args.length > MaxTupleArity)
+        return duplErrorTree(TooManyArgsPatternError(fun))
+
+      //
+      def freshArgType(tp: Type): (List[Symbol], Type) = tp match {
+        case MethodType(param :: _, _) =>
+          (Nil, param.tpe)
+        case PolyType(tparams, restpe) =>
+          createFromClonedSymbols(tparams, freshArgType(restpe)._2)((ps, t) => ((ps, t)))
+        // No longer used, see test case neg/t960.scala (#960 has nothing to do with it)
+        case OverloadedType(_, _) =>
+          OverloadedUnapplyError(fun)
+          (Nil, ErrorType)
+        case _ =>
+          UnapplyWithSingleArgError(fun)
+          (Nil, ErrorType)
+      }
+
+      val unapp     = unapplyMember(otpe)
+      val unappType = otpe.memberType(unapp)
+      val argDummy  = context.owner.newValue(nme.SELECTOR_DUMMY, fun.pos, SYNTHETIC) setInfo pt
+      val arg       = Ident(argDummy) setType pt
+
+      val uncheckedTypeExtractor =
+        if (unappType.paramTypes.nonEmpty)
+          extractorForUncheckedType(tree.pos, unappType.paramTypes.head)
+        else None
+
+      if (!isApplicableSafe(Nil, unappType, List(pt), WildcardType)) {
+        //Console.println("UNAPP: need to typetest, arg.tpe = "+arg.tpe+", unappType = "+unappType)
+        val (freeVars, unappFormal) = freshArgType(unappType.skolemizeExistential(context.owner, tree))
+        val unapplyContext = context.makeNewScope(context.tree, context.owner)
+        freeVars foreach unapplyContext.scope.enter
+
+        val typer1 = newTyper(unapplyContext)
+        val pattp = typer1.infer.inferTypedPattern(tree, unappFormal, arg.tpe, canRemedy = uncheckedTypeExtractor.nonEmpty)
+
+        // turn any unresolved type variables in freevars into existential skolems
+        val skolems = freeVars map (fv => unapplyContext.owner.newExistentialSkolem(fv, fv))
+        arg.tpe = pattp.substSym(freeVars, skolems)
+        argDummy setInfo arg.tpe
+      }
+
+      // setType null is necessary so that ref will be stabilized; see bug 881
+      val fun1 = typedPos(fun.pos)(Apply(Select(fun setType null, unapp), List(arg)))
+
+      if (fun1.tpe.isErroneous) {
+        duplErrTree
+      } else {
+        val formals0 = unapplyTypeList(fun1.symbol, fun1.tpe)
+        val formals1 = formalTypes(formals0, args.length)
+        if (sameLength(formals1, args)) {
+          val args1 = typedArgs(args, mode, formals0, formals1)
+          // This used to be the following (failing) assert:
+          //   assert(isFullyDefined(pt), tree+" ==> "+UnApply(fun1, args1)+", pt = "+pt)
+          // I modified as follows.  See SI-1048.
+          val pt1 = if (isFullyDefined(pt)) pt else makeFullyDefined(pt)
+
+          val itype = glb(List(pt1, arg.tpe))
+          arg.tpe = pt1    // restore type (arg is a dummy tree, just needs to pass typechecking)
+          val unapply = UnApply(fun1, args1) setPos tree.pos setType itype
+
+          // if the type that the unapply method expects for its argument is uncheckable, wrap in classtag extractor
+          // skip if the unapply's type is not a method type with (at least, but really it should be exactly) one argument
+          // also skip if we already wrapped a classtag extractor (so we don't keep doing that forever)
+          if (uncheckedTypeExtractor.isEmpty || fun1.symbol.owner.isNonBottomSubClass(ClassTagClass)) unapply
+          else wrapClassTagUnapply(unapply, uncheckedTypeExtractor.get, unappType.paramTypes.head)
+        } else
+          duplErrorTree(WrongNumberArgsPatternError(tree, fun))
+      }
+    }
+
+    def wrapClassTagUnapply(uncheckedPattern: Tree, classTagExtractor: Tree, pt: Type): Tree = {
+      // TODO: disable when in unchecked match
+      // we don't create a new Context for a Match, so find the CaseDef, then go out one level and navigate back to the match that has this case
+      // val thisCase = context.nextEnclosing(_.tree.isInstanceOf[CaseDef])
+      // val unchecked = thisCase.outer.tree.collect{case Match(selector, cases) if cases contains thisCase => selector} match {
+      //   case List(Typed(_, tpt)) if treeInfo.isUncheckedAnnotation(tpt.tpe) => true
+      //   case t => println("outer tree: "+ (t, thisCase, thisCase.outer.tree)); false
+      // }
+      // println("wrapClassTagUnapply"+ (!isPastTyper && infer.containsUnchecked(pt), pt, uncheckedPattern))
+      // println("wrapClassTagUnapply: "+ extractor)
+      // println(util.Position.formatMessage(uncheckedPattern.pos, "made unchecked type test into a checked one", true))
+
+      val args = List(uncheckedPattern)
+      // must call doTypedUnapply directly, as otherwise we get undesirable rewrites
+      // and re-typechecks of the target of the unapply call in PATTERNmode,
+      // this breaks down when the classTagExtractor (which defineds the unapply member) is not a simple reference to an object,
+      // but an arbitrary tree as is the case here
+      doTypedUnapply(Apply(classTagExtractor, args), classTagExtractor, classTagExtractor, args, PATTERNmode, pt)
+    }
+
+    // if there's a ClassTag that allows us to turn the unchecked type test for `pt` into a checked type test
+    // return the corresponding extractor (an instance of ClassTag[`pt`])
+    def extractorForUncheckedType(pos: Position, pt: Type): Option[Tree] = if (!opt.virtPatmat || isPastTyper) None else {
+      // only look at top-level type, can't (reliably) do anything about unchecked type args (in general)
+      pt.normalize.typeConstructor match {
+        // if at least one of the types in an intersection is checkable, use the checkable ones
+        // this avoids problems as in run/matchonseq.scala, where the expected type is `Coll with scala.collection.SeqLike`
+        // Coll is an abstract type, but SeqLike of course is not
+        case RefinedType(parents, _)  if (parents.length >= 2) && (parents.exists(tp => !infer.containsUnchecked(tp))) =>
+          None
+
+        case ptCheckable if infer.containsUnchecked(ptCheckable) =>
+          val classTagExtractor = resolveClassTag(pos, ptCheckable)
+
+          if (classTagExtractor != EmptyTree && unapplyMember(classTagExtractor.tpe) != NoSymbol)
+            Some(classTagExtractor)
+          else None
+
+        case _ => None
       }
     }
 
@@ -3550,7 +3619,7 @@ trait Typers extends Modes with Adaptations with Tags {
             typedClassOf(tree, args.head, true)
           else {
             if (!isPastTyper && fun.symbol == Any_isInstanceOf && !targs.isEmpty)
-              checkCheckable(tree, targs.head, "")
+              checkCheckable(tree, targs.head, inPattern = false)
             val resultpe = restpe.instantiateTypeParams(tparams, targs)
             //@M substitution in instantiateParams needs to be careful!
             //@M example: class Foo[a] { def foo[m[x]]: m[a] = error("") } (new Foo[Int]).foo[List] : List[Int]
@@ -4807,10 +4876,21 @@ trait Typers extends Modes with Adaptations with Tags {
           }
 
         case Typed(expr, tpt) =>
-          val tpt1 = typedType(tpt, mode)
-          val expr1 = typed(expr, onlyStickyModes(mode), tpt1.tpe.deconst)
-          val ownType = if (isPatternMode) inferTypedPattern(tpt1, tpt1.tpe, pt) else tpt1.tpe
-          treeCopy.Typed(tree, expr1, tpt1) setType ownType
+          val tptTyped  = typedType(tpt, mode)
+          val exprTyped = typed(expr, onlyStickyModes(mode), tptTyped.tpe.deconst)
+          val treeTyped = treeCopy.Typed(tree, exprTyped, tptTyped)
+
+          if (isPatternMode) {
+            val uncheckedTypeExtractor = extractorForUncheckedType(tpt.pos, tptTyped.tpe)
+            val ownType = inferTypedPattern(tptTyped, tptTyped.tpe, pt, canRemedy = uncheckedTypeExtractor.nonEmpty)
+            treeTyped setType ownType
+
+            uncheckedTypeExtractor match {
+              case None => treeTyped
+              case Some(extractor) => wrapClassTagUnapply(treeTyped, extractor, tptTyped.tpe)
+            }
+          } else
+            treeTyped setType tptTyped.tpe
 
         case TypeApply(fun, args) =>
           // @M: kind-arity checking is done here and in adapt, full kind-checking is in checkKindBounds (in Infer)
