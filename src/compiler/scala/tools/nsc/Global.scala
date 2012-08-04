@@ -12,7 +12,7 @@ import scala.tools.util.PathResolver
 import scala.collection.{ mutable, immutable }
 import io.{ SourceReader, AbstractFile, Path }
 import reporters.{ Reporter, ConsoleReporter }
-import util.{ Exceptional, ClassPath, MergedClassPath, Statistics, StatisticsInfo, ScalaClassLoader, returning }
+import util.{ Exceptional, ClassPath, MergedClassPath, StatisticsInfo, ScalaClassLoader, returning }
 import scala.reflect.internal.util.{ NoPosition, SourceFile, NoSourceFile, BatchSourceFile, ScriptSourceFile }
 import scala.reflect.internal.pickling.{ PickleBuffer, PickleFormat }
 import settings.{ AestheticSettings }
@@ -39,7 +39,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     with Plugins
     with PhaseAssembly
     with Trees
-    with TreePrinters
+    with Printers
     with DocComments
     with Positions { self =>
 
@@ -319,7 +319,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       def ccon = Class.forName(name).getConstructor(classOf[CharsetDecoder], classOf[Reporter])
 
       try Some(ccon.newInstance(charset.newDecoder(), reporter).asInstanceOf[SourceReader])
-      catch { case x =>
+      catch { case ex: Throwable =>
         globalError("exception while trying to instantiate source reader '" + name + "'")
         None
       }
@@ -1447,6 +1447,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       settings.userSetSettings filter (_.isDeprecated) foreach { s =>
         unit.deprecationWarning(NoPosition, s.name + " is deprecated: " + s.deprecationMessage.get)
       }
+      if (settings.target.value.contains("jvm-1.5"))
+        unit.deprecationWarning(NoPosition, settings.target.name + ":" + settings.target.value + " is deprecated: use target for Java 1.6 or above.")
     }
 
     /* An iterator returning all the units being compiled in this run */
@@ -1546,7 +1548,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
 
     def compileUnits(units: List[CompilationUnit], fromPhase: Phase) {
       try compileUnitsInternal(units, fromPhase)
-      catch { case ex =>
+      catch { case ex: Throwable =>
         val shown = if (settings.verbose.value) {
           val pw = new java.io.PrintWriter(new java.io.StringWriter)
           ex.printStackTrace(pw)
@@ -1667,13 +1669,14 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     /** Compile abstract file until `globalPhase`, but at least to phase "namer".
      */
     def compileLate(unit: CompilationUnit) {
-      val maxId = math.max(globalPhase.id, typerPhase.id)
       addUnit(unit)
 
-      firstPhase.iterator takeWhile (_.id < maxId) foreach (ph =>
-        atPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit)
-      )
-      refreshProgress
+      if (firstPhase ne null) { // we might get here during initialization, is a source is newer than the binary
+        val maxId = math.max(globalPhase.id, typerPhase.id)
+        firstPhase.iterator takeWhile (_.id < maxId) foreach (ph =>
+          atPhase(ph)(ph.asInstanceOf[GlobalPhase] applyPhase unit))
+        refreshProgress
+      }
     }
 
     /** Reset package class to state at typer (not sure what this

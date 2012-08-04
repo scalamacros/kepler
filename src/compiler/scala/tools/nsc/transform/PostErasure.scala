@@ -21,7 +21,10 @@ trait PostErasure extends InfoTransform with TypingTransformers {
 
   object elimErasedValueType extends TypeMap {
     def apply(tp: Type) = tp match {
-      case ErasedValueType(clazz) => erasure.underlyingOfValueClass(clazz)
+      case ConstantType(Constant(tp: Type)) =>
+        ConstantType(Constant(apply(tp)))
+      case ErasedValueType(tref) =>
+        atPhase(currentRun.erasurePhase)(erasure.erasedValueClassArg(tref))
       case _ => mapOver(tp)
     }
   }
@@ -38,7 +41,7 @@ trait PostErasure extends InfoTransform with TypingTransformers {
             acc), List())
         if atPhase(currentRun.erasurePhase) {
           tpt.tpe.typeSymbol.isDerivedValueClass &&
-          sel.symbol == tpt.tpe.typeSymbol.firstParamAccessor
+          sel.symbol == tpt.tpe.typeSymbol.derivedValueClassUnbox
         } =>
           if (settings.debug.value) log("Removing "+tree+" -> "+arg)
           arg
@@ -49,7 +52,7 @@ trait PostErasure extends InfoTransform with TypingTransformers {
             List(Apply(Select(New(tpt2), nme.CONSTRUCTOR), List(arg2))))
         if atPhase(currentRun.erasurePhase) {
           tpt1.tpe.typeSymbol.isDerivedValueClass &&
-          (cmp == nme.EQ || cmp == nme.NE) &&
+          (sel.symbol == Object_== || sel.symbol == Object_!=) &&
           tpt2.tpe.typeSymbol == tpt1.tpe.typeSymbol
         } =>
           val result = Apply(Select(arg1, cmp) setPos sel.pos, List(arg2)) setPos tree.pos

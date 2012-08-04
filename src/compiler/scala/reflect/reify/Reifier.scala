@@ -1,8 +1,8 @@
 package scala.reflect.reify
 
 import scala.tools.nsc.Global
-import scala.reflect.makro.ReificationError
-import scala.reflect.makro.UnexpectedReificationError
+import scala.reflect.macros.ReificationError
+import scala.reflect.macros.UnexpectedReificationError
 import scala.reflect.reify.utils.Utils
 
 /** Given a tree or a type, generate a tree that when executed at runtime produces the original tree or type.
@@ -68,20 +68,6 @@ abstract class Reifier extends States
           val pipeline = mkReificationPipeline
           val rtree = pipeline(tree)
 
-          // consider the following code snippet
-          //
-          //   val x = reify { class C; new C }
-          //
-          // inferred type for x will be C
-          // but C ceases to exist after reification so this type is clearly incorrect
-          // however, reify is "just" a library function, so it cannot affect type inference
-          //
-          // hence we crash here even though the reification itself goes well
-          // fortunately, all that it takes to fix the error is to cast "new C" to Object
-          // so I'm not very much worried about introducing this restriction
-          if (tree.tpe exists (sub => sub.typeSymbol.isLocalToReifee))
-            CannotReifyReifeeThatHasTypeLocalToReifee(tree)
-
           val tpe = typer.packedType(tree, NoSymbol)
           val ReifiedType(_, _, tpeSymtab, _, rtpe, tpeReificationIsConcrete) = `package`.reifyType(global)(typer, universe, mirror, tpe, concrete = false)
           state.reificationIsConcrete &= tpeReificationIsConcrete
@@ -129,7 +115,7 @@ abstract class Reifier extends States
       // todo. maybe try `resetLocalAttrs` once the dust settles
       var importantSymbols = Set[Symbol](
         NothingClass, AnyClass, SingletonClass, PredefModule, ScalaRunTimeModule, TypeCreatorClass, TreeCreatorClass, MirrorOfClass,
-        BaseUniverseClass, ApiUniverseClass, JavaUniverseClass, ReflectRuntimePackage, ReflectRuntimeCurrentMirror)
+        BaseUniverseClass, JavaUniverseClass, ReflectRuntimePackage, ReflectRuntimeCurrentMirror)
       importantSymbols ++= importantSymbols map (_.companionSymbol)
       importantSymbols ++= importantSymbols map (_.moduleClass)
       importantSymbols ++= importantSymbols map (_.linkedClassOfClass)

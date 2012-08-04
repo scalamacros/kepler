@@ -8,7 +8,6 @@ package doc
 package model
 
 import scala.collection._
-import language.reflectiveCalls
 
 object IndexModelFactory {
 
@@ -36,7 +35,6 @@ object IndexModelFactory {
           } + d
           this(firstLetter) = letter + (d.name -> members)
         }
-
       }
 
       //@scala.annotation.tailrec // TODO
@@ -46,11 +44,7 @@ object IndexModelFactory {
             case tpl: DocTemplateEntity =>
               result.addMember(tpl)
               gather(tpl)
-            case alias: AliasType =>
-              result.addMember(alias)
-            case absType: AbstractType =>
-              result.addMember(absType)
-            case non: NonTemplateMemberEntity if !non.isConstructor =>
+            case non: MemberEntity if !non.isConstructor =>
               result.addMember(non)
             case x @ _ =>
           }

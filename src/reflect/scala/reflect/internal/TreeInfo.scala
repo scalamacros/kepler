@@ -316,7 +316,7 @@ abstract class TreeInfo {
 
   /** Is name a variable name? */
   def isVariableName(name: Name): Boolean = {
-    val first = name(0)
+    val first = name.startChar
     ((first.isLower && first.isLetter) || first == '_') && !reserved(name)
   }
 
@@ -442,6 +442,9 @@ abstract class TreeInfo {
       }
 */
 
+  /** Is this case guarded? */
+  def isGuardedCase(cdef: CaseDef) = cdef.guard != EmptyTree
+
   /** Is this pattern node a sequence-valued pattern? */
   def isSequenceValued(tree: Tree): Boolean = unbind(tree) match {
     case Alternative(ts)            => ts exists isSequenceValued
@@ -460,6 +463,16 @@ abstract class TreeInfo {
     case Star(_)  => true
     case _        => false
   }
+
+
+  // used in the symbols for labeldefs and valdefs emitted by the pattern matcher
+  // tailcalls, cps,... use this flag combination to detect translated matches
+  // TODO: move to Flags
+  final val SYNTH_CASE_FLAGS  = CASE | SYNTHETIC
+
+  def isSynthCaseSymbol(sym: Symbol) = sym hasAllFlags SYNTH_CASE_FLAGS
+  def hasSynthCaseSymbol(t: Tree)    = t.symbol != null && isSynthCaseSymbol(t.symbol)
+
 
   /** The method part of an application node
    */

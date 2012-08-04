@@ -1,7 +1,7 @@
 package scala.reflect.reify
 
-import scala.reflect.makro.ReificationError
-import scala.reflect.makro.UnexpectedReificationError
+import scala.reflect.macros.ReificationError
+import scala.reflect.macros.UnexpectedReificationError
 
 trait Errors {
   self: Reifier =>
@@ -16,11 +16,6 @@ trait Errors {
 
   // expected errors: these can happen if the user casually writes whatever.reify(...)
   // hence we don't crash here, but nicely report a typechecking error and bail out asap
-
-  def CannotReifyReifeeThatHasTypeLocalToReifee(tree: Tree) = {
-    val msg = "implementation restriction: cannot reify block of type %s that involves a type declared inside the block being reified. consider casting the return value to a suitable type".format(tree.tpe)
-    throw new ReificationError(tree.pos, msg)
-  }
 
   def CannotReifyType(tpe: Type) = {
     val msg = "implementation restriction: cannot reify type %s (%s)".format(tpe, tpe.kind)

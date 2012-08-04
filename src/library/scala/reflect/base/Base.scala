@@ -1,7 +1,6 @@
 package scala.reflect
 package base
 
-import language.experimental.macros
 import java.io.PrintWriter
 import scala.annotation.switch
 import scala.ref.WeakReference
@@ -23,7 +22,7 @@ class Base extends Universe { self =>
       new TermSymbol(this, name, flags)
 
     def newModuleAndClassSymbol(name: Name, pos: Position = NoPosition, flags: FlagSet = NoFlags): (ModuleSymbol, ClassSymbol) = {
-      val c = newClassSymbol(name.toTypeName, pos, flags)
+      val c = new ModuleClassSymbol(this, name.toTypeName, flags)
       val m = new ModuleSymbol(this, name.toTermName, flags, c)
       (m, c)
     }
@@ -52,7 +51,6 @@ class Base extends Universe { self =>
       else if (isFreeTerm) "free term"
       else if (isTerm) "value"
       else "symbol"
-    // [Eugene++ to Martin] base names should expose `decode`
     override def toString() = s"$kindString $name"
   }
   implicit val SymbolTag = ClassTag[Symbol](classOf[Symbol])
@@ -63,7 +61,9 @@ class Base extends Universe { self =>
 
   class TypeSymbol(val owner: Symbol, override val name: TypeName, flags: FlagSet)
       extends Symbol(name, flags) with TypeSymbolBase {
-    override val asTypeConstructor = TypeRef(ThisType(owner), this, Nil)
+    override def toTypeConstructor = TypeRef(ThisType(owner), this, Nil)
+    override def toType = TypeRef(ThisType(owner), this, Nil)
+    override def toTypeIn(site: Type) = TypeRef(ThisType(owner), this, Nil)
   }
   implicit val TypeSymbolTag = ClassTag[TypeSymbol](classOf[TypeSymbol])
 
@@ -77,6 +77,8 @@ class Base extends Universe { self =>
 
   class ClassSymbol(owner: Symbol, name: TypeName, flags: FlagSet)
       extends TypeSymbol(owner, name, flags) with ClassSymbolBase
+  class ModuleClassSymbol(owner: Symbol, name: TypeName, flags: FlagSet)
+      extends ClassSymbol(owner, name, flags) { override def isModuleClass = true }
   implicit val ClassSymbolTag = ClassTag[ClassSymbol](classOf[ClassSymbol])
 
   class FreeTermSymbol(owner: Symbol, name: TermName, flags: FlagSet)
@@ -93,11 +95,14 @@ class Base extends Universe { self =>
   }
 
   // todo. write a decent toString that doesn't crash on recursive types
-  class Type extends TypeBase { def typeSymbol: Symbol = NoSymbol }
+  class Type extends TypeBase {
+    def termSymbol: Symbol = NoSymbol
+    def typeSymbol: Symbol = NoSymbol
+  }
   implicit val TypeTagg = ClassTag[Type](classOf[Type])
 
-  val NoType = new Type
-  val NoPrefix = new Type
+  val NoType = new Type { override def toString = "NoType" }
+  val NoPrefix = new Type { override def toString = "NoPrefix" }
 
   class SingletonType extends Type
   implicit val SingletonTypeTag = ClassTag[SingletonType](classOf[SingletonType])
@@ -106,7 +111,7 @@ class Base extends Universe { self =>
   object ThisType extends ThisTypeExtractor
   implicit val ThisTypeTag = ClassTag[ThisType](classOf[ThisType])
 
-  case class SingleType(pre: Type, sym: Symbol) extends SingletonType
+  case class SingleType(pre: Type, sym: Symbol) extends SingletonType { override val termSymbol = sym }
   object SingleType extends SingleTypeExtractor
   implicit val SingleTypeTag = ClassTag[SingleType](classOf[SingleType])
 
@@ -166,12 +171,17 @@ class Base extends Universe { self =>
   object BoundedWildcardType extends BoundedWildcardTypeExtractor
   implicit val BoundedWildcardTypeTag = ClassTag[BoundedWildcardType](classOf[BoundedWildcardType])
 
-  type Scope = Iterable[Symbol]
+  class Scope(elems: Iterable[Symbol]) extends ScopeBase with MemberScopeBase {
+    def iterator = elems.iterator
+    def sorted = elems.toList
+  }
+  type MemberScope = Scope
   implicit val ScopeTag = ClassTag[Scope](classOf[Scope])
+  implicit val MemberScopeTag = ClassTag[MemberScope](classOf[MemberScope])
 
-  def newScope = newScopeWith()
-  def newNestedScope(outer: Iterable[Symbol]) = newScope
-  def newScopeWith(elems: Symbol*): Scope = elems
+  def newScope: Scope = newScopeWith()
+  def newNestedScope(outer: Scope): Scope = newScope
+  def newScopeWith(elems: Symbol*): Scope = new Scope(elems)
 
   abstract class Name(str: String) extends NameBase {
     override def toString = str
@@ -199,20 +209,22 @@ class Base extends Universe { self =>
 
   object nme extends TermNamesBase {
     type NameType = TermName
-    val EMPTY              = newTermName("")
-    val ROOT               = newTermName("<root>")
-    val EMPTY_PACKAGE_NAME = newTermName("<empty>")
-    val CONSTRUCTOR        = newTermName("<init>")
+    val WILDCARD             = newTermName("_")
+    val CONSTRUCTOR          = newTermName("<init>")
+    val ROOTPKG              = newTermName("_root_")
+    val EMPTY                = newTermName("")
+    val EMPTY_PACKAGE_NAME   = newTermName("<empty>")
+    val ROOT                 = newTermName("<root>")
     val NO_NAME            = newTermName("<none>")
-    val WILDCARD           = newTermName("_")
   }
 
   object tpnme extends TypeNamesBase {
     type NameType = TypeName
-    val EMPTY              = nme.EMPTY.toTypeName
-    val ROOT               = nme.ROOT.toTypeName
-    val EMPTY_PACKAGE_NAME = nme.EMPTY_PACKAGE_NAME.toTypeName
-    val WILDCARD           = nme.WILDCARD.toTypeName
+    val WILDCARD             = nme.WILDCARD.toTypeName
+    val EMPTY                = nme.EMPTY.toTypeName
+    val WILDCARD_STAR        = newTypeName("_*")
+    val EMPTY_PACKAGE_NAME   = nme.EMPTY_PACKAGE_NAME.toTypeName
+    val ROOT                 = nme.ROOT.toTypeName
   }
 
   type FlagSet = Long
@@ -223,7 +235,6 @@ class Base extends Universe { self =>
                   override val privateWithin: Name,
                   override val annotations: List[Tree]) extends ModifiersBase {
     def hasFlag(flags: FlagSet) = (this.flags & flags) != 0
-    def hasAllFlags(flags: FlagSet) = (flags & ~this.flags) == 0
   }
 
   implicit val ModifiersTag = ClassTag[Modifiers](classOf[Modifiers])
@@ -285,16 +296,16 @@ class Base extends Universe { self =>
   object build extends BuildBase {
     def selectType(owner: Symbol, name: String): TypeSymbol = {
       val clazz = new ClassSymbol(owner, newTypeName(name), NoFlags)
-      cached(clazz.fullName)(clazz).asTypeSymbol
+      cached(clazz.fullName)(clazz).asType
     }
 
     def selectTerm(owner: Symbol, name: String): TermSymbol = {
       val valu = new MethodSymbol(owner, newTermName(name), NoFlags)
-      cached(valu.fullName)(valu).asTermSymbol
+      cached(valu.fullName)(valu).asTerm
     }
 
     def selectOverloadedMethod(owner: Symbol, name: String, index: Int): MethodSymbol =
-      selectTerm(owner, name).asMethodSymbol
+      selectTerm(owner, name).asMethod
 
     def newNestedSymbol(owner: Symbol, name: Name, pos: Position, flags: Long, isClass: Boolean): Symbol =
       if (name.isTypeName)
@@ -341,9 +352,9 @@ class Base extends Universe { self =>
   class Mirror extends MirrorOf[self.type] {
     val universe: self.type = self
 
-    lazy val RootClass    = new ClassSymbol(NoSymbol, tpnme.ROOT, NoFlags)
+    lazy val RootClass    = new ClassSymbol(NoSymbol, tpnme.ROOT, NoFlags) { override def isModuleClass = true }
     lazy val RootPackage  = new ModuleSymbol(NoSymbol, nme.ROOT, NoFlags, RootClass)
-    lazy val EmptyPackageClass = new ClassSymbol(RootClass, tpnme.EMPTY_PACKAGE_NAME, NoFlags)
+    lazy val EmptyPackageClass = new ClassSymbol(RootClass, tpnme.EMPTY_PACKAGE_NAME, NoFlags) { override def isModuleClass = true }
     lazy val EmptyPackage = new ModuleSymbol(RootClass, nme.EMPTY_PACKAGE_NAME, NoFlags, EmptyPackageClass)
 
     def staticClass(fullName: String): ClassSymbol =
@@ -351,6 +362,9 @@ class Base extends Universe { self =>
 
     def staticModule(fullName: String): ModuleSymbol =
       mkStatic[ModuleSymbol](fullName)
+
+    def staticPackage(fullName: String): ModuleSymbol =
+      staticModule(fullName) // this toy universe doesn't care about the distinction between packages and modules
 
     private def mkStatic[S <: Symbol : ClassTag](fullName: String): S =
       cached(fullName) {
@@ -371,7 +385,7 @@ class Base extends Universe { self =>
 
   object definitions extends DefinitionsBase {
     lazy val ScalaPackage = staticModule("scala")
-    lazy val ScalaPackageClass = ScalaPackage.moduleClass.asClassSymbol
+    lazy val ScalaPackageClass = ScalaPackage.moduleClass.asClass
 
     lazy val AnyClass     = staticClass("scala.Any")
     lazy val AnyValClass  = staticClass("scala.Any")
@@ -420,7 +434,6 @@ class Base extends Universe { self =>
   lazy val NullTpe    = TypeRef(ScalaPrefix, NullClass, Nil)
   lazy val ObjectTpe  = TypeRef(JavaLangPrefix, ObjectClass, Nil)
   lazy val AnyRefTpe  = ObjectTpe
-  lazy val StringTpe  = TypeRef(JavaLangPrefix, StringClass, Nil)
 
   private var nodeCount = 0 // not synchronized
 
@@ -451,7 +464,9 @@ class Base extends Universe { self =>
     }
   }
 
-  def show(tree: Tree) = s"<tree ${tree.getClass}>"
+  def treeToString(tree: Tree) = s"<tree ${tree.getClass}>"
+
+  def treeType(tree: Tree) = NoType
 
   trait TermTree extends Tree
 

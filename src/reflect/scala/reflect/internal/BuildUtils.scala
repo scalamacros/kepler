@@ -7,24 +7,26 @@ trait BuildUtils extends base.BuildUtils { self: SymbolTable =>
 
   class BuildImpl extends BuildBase {
 
-    def selectType(owner: Symbol, name: String): TypeSymbol = {
-      val result = owner.info.decl(newTypeName(name))
-      if (result ne NoSymbol) result.asTypeSymbol
-      else MissingRequirementError.notFound("type %s in %s".format(name, owner.fullName))
-    }
+    def selectType(owner: Symbol, name: String): TypeSymbol =
+      select(owner, newTypeName(name)).asType
 
     def selectTerm(owner: Symbol, name: String): TermSymbol = {
-      val sym = owner.info.decl(newTermName(name))
-      val result =
-        if (sym.isOverloaded) sym.suchThat(!_.isMethod)
-        else sym
-      if (result ne NoSymbol) result.asTermSymbol
-      else MissingRequirementError.notFound("term %s in %s".format(name, owner.fullName))
+      val result = select(owner, newTermName(name)).asTerm
+      if (result.isOverloaded) result.suchThat(!_.isMethod).asTerm
+      else result
+    }
+
+    private def select(owner: Symbol, name: Name): Symbol = {
+      val result = owner.info decl name
+      if (result ne NoSymbol) result
+      else
+        mirrorThatLoaded(owner).missingHook(owner, name) orElse
+        MissingRequirementError.notFound("%s %s in %s".format(if (name.isTermName) "term" else "type", name, owner.fullName))
     }
 
     def selectOverloadedMethod(owner: Symbol, name: String, index: Int): MethodSymbol = {
       val result = owner.info.decl(newTermName(name)).alternatives(index)
-      if (result ne NoSymbol) result.asMethodSymbol
+      if (result ne NoSymbol) result.asMethod
       else MissingRequirementError.notFound("overloaded method %s #%d in %s".format(name, index, owner.fullName))
     }
 

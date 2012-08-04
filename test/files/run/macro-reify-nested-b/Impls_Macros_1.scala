@@ -1,6 +1,6 @@
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.{universe => ru}
-import scala.reflect.makro.Context
+import scala.reflect.macros.Context
 
 case class Utils[C <: Context]( c:C ) {
   import c.universe._
@@ -30,10 +30,10 @@ object QueryableMacros{
         Apply(Select(c.prefix.tree, newTermName( name )), List( projection.tree ))
        ).asInstanceOf[Tree]
       )))
-    c.reify{ Queryable.factory[S]( foo.splice )}
+    c.universe.reify{ Queryable.factory[S]( foo.splice )}
   }
   def map[T:c.TypeTag, S:c.TypeTag]
-               (c: scala.reflect.makro.Context)
+               (c: scala.reflect.macros.Context)
                (projection: c.Expr[T => S]): c.Expr[Queryable[S]] = _helper[c.type,S]( c )( "_map", projection )
 }
 class Queryable[T]{

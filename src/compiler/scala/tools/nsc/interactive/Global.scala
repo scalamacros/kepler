@@ -485,8 +485,8 @@ class Global(settings: Settings, _reporter: Reporter, projectName: String = "")
       } catch {
         case ex: FreshRunReq => throw ex           // propagate a new run request
         case ShutdownReq     => throw ShutdownReq  // propagate a shutdown request
-
-        case ex =>
+        case ex: ControlThrowable => throw ex
+        case ex: Throwable =>
           println("[%s]: exception during background compile: ".format(unit.source) + ex)
           ex.printStackTrace()
           for (r <- waitLoadedTypeResponses(unit.source)) {
@@ -627,7 +627,7 @@ class Global(settings: Settings, _reporter: Reporter, projectName: String = "")
         response raise ex
         throw ex
 
-      case ex =>
+      case ex: Throwable =>
         if (debugIDE) {
           println("exception thrown during response: "+ex)
           ex.printStackTrace()
@@ -749,13 +749,23 @@ class Global(settings: Settings, _reporter: Reporter, projectName: String = "")
       val originalTypeParams = sym.owner.typeParams
       parseAndEnter(unit)
       val pre = adaptToNewRunMap(ThisType(sym.owner))
-      val newsym = pre.typeSymbol.info.decl(sym.name) filter { alt =>
+      val rawsym = pre.typeSymbol.info.decl(sym.name)
+      val newsym = rawsym filter { alt =>
         sym.isType || {
           try {
             val tp1 = pre.memberType(alt) onTypeError NoType
             val tp2 = adaptToNewRunMap(sym.tpe) substSym (originalTypeParams, sym.owner.typeParams)
-            matchesType(tp1, tp2, false)
-          } catch {
+            matchesType(tp1, tp2, false) || {
+              debugLog(s"getLinkPos matchesType($tp1, $tp2) failed")
+              val tp3 = adaptToNewRunMap(sym.tpe) substSym (originalTypeParams, alt.owner.typeParams)
+              matchesType(tp1, tp3, false) || {
+                debugLog(s"getLinkPos fallback matchesType($tp1, $tp3) failed")
+                false
+              }
+            }
+          }
+          catch {
+            case ex: ControlThrowable => throw ex
             case ex: Throwable =>
               println("error in hyperlinking: " + ex)
               ex.printStackTrace()
@@ -764,8 +774,11 @@ class Global(settings: Settings, _reporter: Reporter, projectName: String = "")
         }
       }
       if (newsym == NoSymbol) {
-        debugLog("link not found " + sym + " " + source + " " + pre)
-        NoPosition
+        if (rawsym.exists && !rawsym.isOverloaded) rawsym.pos
+        else {
+          debugLog("link not found " + sym + " " + source + " " + pre)
+          NoPosition
+        }
       } else if (newsym.isOverloaded) {
         settings.uniqid.value = true
         debugLog("link ambiguous " + sym + " " + source + " " + pre + " " + newsym.alternatives)
@@ -1028,11 +1041,15 @@ class Global(settings: Settings, _reporter: Reporter, projectName: String = "")
     }
   }
 
-  def getInstrumented(source: SourceFile, line: Int, response: Response[(String, Array[Char])]) {
-    respond(response) {
-      instrument(source, line)
+  def getInstrumented(source: SourceFile, line: Int, response: Response[(String, Array[Char])]) =
+    try {
+      interruptsEnabled = false
+      respond(response) {
+        instrument(source, line)
+      }
+    } finally {
+      interruptsEnabled = true
     }
-  }
 
   // ---------------- Helper classes ---------------------------
 

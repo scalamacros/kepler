@@ -134,10 +134,11 @@ trait TypeTags { self: Universe =>
     val Boolean : AbsTypeTag[scala.Boolean]    = TypeTag.Boolean
     val Unit    : AbsTypeTag[scala.Unit]       = TypeTag.Unit
     val Any     : AbsTypeTag[scala.Any]        = TypeTag.Any
+    val AnyVal  : AbsTypeTag[scala.AnyVal]     = TypeTag.AnyVal
+    val AnyRef  : AbsTypeTag[scala.AnyRef]     = TypeTag.AnyRef
     val Object  : AbsTypeTag[java.lang.Object] = TypeTag.Object
     val Nothing : AbsTypeTag[scala.Nothing]    = TypeTag.Nothing
     val Null    : AbsTypeTag[scala.Null]       = TypeTag.Null
-    val String  : AbsTypeTag[java.lang.String] = TypeTag.String
 
     def apply[T](mirror1: MirrorOf[self.type], tpec1: TypeCreator): AbsTypeTag[T] =
       tpec1(mirror1) match {
@@ -151,10 +152,11 @@ trait TypeTags { self: Universe =>
         case BooleanTpe => AbsTypeTag.Boolean.asInstanceOf[AbsTypeTag[T]]
         case UnitTpe    => AbsTypeTag.Unit.asInstanceOf[AbsTypeTag[T]]
         case AnyTpe     => AbsTypeTag.Any.asInstanceOf[AbsTypeTag[T]]
+        case AnyValTpe  => AbsTypeTag.AnyVal.asInstanceOf[AbsTypeTag[T]]
+        case AnyRefTpe  => AbsTypeTag.AnyRef.asInstanceOf[AbsTypeTag[T]]
         case ObjectTpe  => AbsTypeTag.Object.asInstanceOf[AbsTypeTag[T]]
         case NothingTpe => AbsTypeTag.Nothing.asInstanceOf[AbsTypeTag[T]]
         case NullTpe    => AbsTypeTag.Null.asInstanceOf[AbsTypeTag[T]]
-        case StringTpe  => AbsTypeTag.String.asInstanceOf[AbsTypeTag[T]]
         case _          => new AbsTypeTagImpl[T](mirror1.asInstanceOf[Mirror], tpec1)
       }
 
@@ -167,6 +169,7 @@ trait TypeTags { self: Universe =>
       val otherMirror1 = otherMirror.asInstanceOf[MirrorOf[otherMirror.universe.type]]
       otherMirror.universe.AbsTypeTag[T](otherMirror1, tpec)
     }
+    private def writeReplace(): AnyRef = new SerializedTypeTag(tpec, concrete = false)
   }
 
   /**
@@ -197,10 +200,11 @@ trait TypeTags { self: Universe =>
     val Boolean: TypeTag[scala.Boolean]    = new PredefTypeTag[scala.Boolean]    (BooleanTpe, _.TypeTag.Boolean)
     val Unit:    TypeTag[scala.Unit]       = new PredefTypeTag[scala.Unit]       (UnitTpe,    _.TypeTag.Unit)
     val Any:     TypeTag[scala.Any]        = new PredefTypeTag[scala.Any]        (AnyTpe,     _.TypeTag.Any)
+    val AnyVal:  TypeTag[scala.AnyVal]     = new PredefTypeTag[scala.AnyVal]     (AnyValTpe,  _.TypeTag.AnyVal)
+    val AnyRef:  TypeTag[scala.AnyRef]     = new PredefTypeTag[scala.AnyRef]     (AnyRefTpe,  _.TypeTag.AnyRef)
     val Object:  TypeTag[java.lang.Object] = new PredefTypeTag[java.lang.Object] (ObjectTpe,  _.TypeTag.Object)
     val Nothing: TypeTag[scala.Nothing]    = new PredefTypeTag[scala.Nothing]    (NothingTpe, _.TypeTag.Nothing)
     val Null:    TypeTag[scala.Null]       = new PredefTypeTag[scala.Null]       (NullTpe,    _.TypeTag.Null)
-    val String:  TypeTag[java.lang.String] = new PredefTypeTag[java.lang.String] (StringTpe,  _.TypeTag.String)
 
     def apply[T](mirror1: MirrorOf[self.type], tpec1: TypeCreator): TypeTag[T] =
       tpec1(mirror1) match {
@@ -214,10 +218,11 @@ trait TypeTags { self: Universe =>
         case BooleanTpe => TypeTag.Boolean.asInstanceOf[TypeTag[T]]
         case UnitTpe    => TypeTag.Unit.asInstanceOf[TypeTag[T]]
         case AnyTpe     => TypeTag.Any.asInstanceOf[TypeTag[T]]
+        case AnyValTpe  => TypeTag.AnyVal.asInstanceOf[TypeTag[T]]
+        case AnyRefTpe  => TypeTag.AnyRef.asInstanceOf[TypeTag[T]]
         case ObjectTpe  => TypeTag.Object.asInstanceOf[TypeTag[T]]
         case NothingTpe => TypeTag.Nothing.asInstanceOf[TypeTag[T]]
         case NullTpe    => TypeTag.Null.asInstanceOf[TypeTag[T]]
-        case StringTpe  => TypeTag.String.asInstanceOf[TypeTag[T]]
         case _          => new TypeTagImpl[T](mirror1.asInstanceOf[Mirror], tpec1)
       }
 
@@ -229,13 +234,18 @@ trait TypeTags { self: Universe =>
       val otherMirror1 = otherMirror.asInstanceOf[MirrorOf[otherMirror.universe.type]]
       otherMirror.universe.TypeTag[T](otherMirror1, tpec)
     }
+    private def writeReplace(): AnyRef = new SerializedTypeTag(tpec, concrete = true)
   }
 
-  private class PredefTypeTag[T](_tpe: Type, copyIn: Universe => Universe # TypeTag[T]) extends TypeTagImpl[T](rootMirror, null) {
+  private class PredefTypeCreator[T](copyIn: Universe => Universe # TypeTag[T]) extends TypeCreator {
+    def apply[U <: Universe with Singleton](m: MirrorOf[U]): U # Type = {
+      copyIn(m.universe).asInstanceOf[U # TypeTag[T]].tpe
+    }
+  }
+
+  private class PredefTypeTag[T](_tpe: Type, copyIn: Universe => Universe # TypeTag[T]) extends TypeTagImpl[T](rootMirror, new PredefTypeCreator(copyIn)) {
     override lazy val tpe: Type = _tpe
-    override def in[U <: Universe with Singleton](otherMirror: MirrorOf[U]): U # TypeTag[T] =
-      copyIn(otherMirror.universe).asInstanceOf[U # TypeTag[T]]
-    private def readResolve() = copyIn(self)
+    private def writeReplace(): AnyRef = new SerializedTypeTag(tpec, concrete = true)
   }
 
   // incantations
@@ -243,4 +253,22 @@ trait TypeTags { self: Universe =>
 
   // big thanks to Viktor Klang for this brilliant idea!
   def typeOf[T](implicit ttag: TypeTag[T]): Type = ttag.tpe
+}
+
+private[scala] class SerializedTypeTag(var tpec: TypeCreator, var concrete: Boolean) extends Serializable {
+  private def writeObject(out: java.io.ObjectOutputStream): Unit = {
+    out.writeObject(tpec)
+    out.writeBoolean(concrete)
+  }
+
+  private def readObject(in: java.io.ObjectInputStream): Unit = {
+    tpec = in.readObject().asInstanceOf[TypeCreator]
+    concrete = in.readBoolean()
+  }
+
+  private def readResolve(): AnyRef = {
+    import scala.reflect.basis._
+    if (concrete) TypeTag(rootMirror, tpec)
+    else AbsTypeTag(rootMirror, tpec)
+  }
 }

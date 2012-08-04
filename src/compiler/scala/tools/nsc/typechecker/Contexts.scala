@@ -100,6 +100,12 @@ trait Contexts { self: Analyzer =>
     var outer: Context = _                  // The next outer context
     var enclClass: Context = _              // The next outer context whose tree is a
                                             // template or package definition
+    @inline final def savingEnclClass[A](c: Context)(a: => A): A = {
+      val saved = enclClass
+      enclClass = c
+      try a finally enclClass = saved
+    }
+
     var enclMethod: Context = _             // The next outer context whose tree is a method
     var variance: Int = _                   // Variance relative to enclosing class
     private var _undetparams: List[Symbol] = List() // Undetermined type parameters,
@@ -354,7 +360,7 @@ trait Contexts { self: Analyzer =>
 
     private def unitError(pos: Position, msg: String) =
       unit.error(pos, if (checking) "\n**** ERROR DURING INTERNAL CHECKING ****\n" + msg else msg)
-    
+
     @inline private def issueCommon(err: AbsTypeError)(pf: PartialFunction[AbsTypeError, Unit]) {
       debugwarn("issue error: " + err.errMsg)
       if (settings.Yissuedebug.value) (new Exception).printStackTrace()
@@ -546,7 +552,6 @@ trait Contexts { self: Analyzer =>
         (  (ab.isTerm || ab == rootMirror.RootClass)
         || (accessWithin(ab) || accessWithinLinked(ab)) &&
              (  !sym.hasLocalFlag
-             || sym.owner.isImplClass // allow private local accesses to impl classes
              || sym.isProtected && isSubThisType(pre, sym.owner)
              || pre =:= sym.owner.thisType
              )
@@ -606,8 +611,8 @@ trait Contexts { self: Analyzer =>
         (e ne null) && (e.owner == scope)
       })
 
-    private def collectImplicits(syms: List[Symbol], pre: Type, imported: Boolean = false): List[ImplicitInfo] =
-      for (sym <- syms if isQualifyingImplicit(sym.name, sym, pre, imported)) yield
+    private def collectImplicits(syms: Scope, pre: Type, imported: Boolean = false): List[ImplicitInfo] =
+      for (sym <- syms.toList if isQualifyingImplicit(sym.name, sym, pre, imported)) yield
         new ImplicitInfo(sym.name, pre, sym)
 
     private def collectImplicitImports(imp: ImportInfo): List[ImplicitInfo] = {
@@ -630,6 +635,12 @@ trait Contexts { self: Analyzer =>
       collect(imp.tree.selectors)
     }
 
+    /* SI-5892 / SI-4270: `implicitss` can return results which are not accessible at the
+     * point where implicit search is triggered. Example: implicits in (annotations of)
+     * class type parameters (SI-5892). The `context.owner` is the class symbol, therefore
+     * `implicitss` will return implicit conversions defined inside the class. These are
+     * filtered out later by `eligibleInfos` (SI-4270 / 9129cfe9), as they don't type-check.
+     */
     def implicitss: List[List[ImplicitInfo]] = {
       if (implicitsRunId != currentRunId) {
         implicitsRunId = currentRunId
@@ -638,14 +649,15 @@ trait Contexts { self: Analyzer =>
           if (owner != nextOuter.owner && owner.isClass && !owner.isPackageClass && !inSelfSuperCall) {
             if (!owner.isInitialized) return nextOuter.implicitss
             // debuglog("collect member implicits " + owner + ", implicit members = " + owner.thisType.implicitMembers)//DEBUG
-            val savedEnclClass = enclClass
-            this.enclClass = this
-            val res = collectImplicits(owner.thisType.implicitMembers, owner.thisType)
-            this.enclClass = savedEnclClass
-            res
+            savingEnclClass(this) {
+              // !!! In the body of `class C(implicit a: A) { }`, `implicitss` returns `List(List(a), List(a), List(<predef..)))`
+              //     it handled correctly by implicit search, which considers the second `a` to be shadowed, but should be
+              //     remedied nonetheless.
+              collectImplicits(owner.thisType.implicitMembers, owner.thisType)
+            }
           } else if (scope != nextOuter.scope && !owner.isPackageClass) {
             debuglog("collect local implicits " + scope.toList)//DEBUG
-            collectImplicits(scope.toList, NoPrefix)
+            collectImplicits(scope, NoPrefix)
           } else if (imports != nextOuter.imports) {
             assert(imports.tail == nextOuter.imports, (imports, nextOuter.imports))
             collectImplicitImports(imports.head)
@@ -713,7 +725,7 @@ trait Contexts { self: Analyzer =>
       result
     }
 
-    def allImportedSymbols: List[Symbol] =
+    def allImportedSymbols: Iterable[Symbol] =
       qual.tpe.members flatMap (transformImport(tree.selectors, _))
 
     private def transformImport(selectors: List[ImportSelector], sym: Symbol): List[Symbol] = selectors match {

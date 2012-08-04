@@ -1,4 +1,4 @@
-import scala.reflect.makro.Context
+import scala.reflect.macros.Context
 
 object Macros {
   def impl(c: Context): c.Expr[Unit] = {
@@ -16,7 +16,7 @@ object Macros {
 
     import c.universe._
     val next = if (c.enclosingMacros.length < 3) c.Expr[Unit](Select(Ident(c.mirror.staticModule("Macros")), newTermName("foo"))) else c.literalUnit
-    c.reify {
+    c.universe.reify {
       println(c.literal(normalizePaths(c.enclosingMacros.toString)).splice)
       next.splice
     }

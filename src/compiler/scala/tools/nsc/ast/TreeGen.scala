@@ -72,8 +72,6 @@ abstract class TreeGen extends reflect.internal.TreeGen with TreeDSL {
     Annotated(Ident(nme.synthSwitch), expr)
   }
 
-  def hasSynthCaseSymbol(t: Tree) = (t.symbol ne null) && (t.symbol hasFlag (CASE | SYNTHETIC))
-
   // TODO: would be so much nicer if we would know during match-translation (i.e., type checking)
   // whether we should emit missingCase-style apply (and isDefinedAt), instead of transforming trees post-factum
   class MatchMatcher {
@@ -94,13 +92,13 @@ abstract class TreeGen extends reflect.internal.TreeGen with TreeDSL {
       case Apply(Apply(TypeApply(Select(tgt, nme.runOrElse), targs), List(scrut)), List(matcher)) if opt.virtPatmat => // println("virt match: "+ (tgt, targs, scrut, matcher) + "for:\n"+ matchExpr )
         caseVirtualizedMatch(matchExpr, tgt, targs, scrut, matcher)
       // optimized version of virtpatmat
-      case Block(stats, matchEndDef) if opt.virtPatmat && (stats forall hasSynthCaseSymbol) =>
+      case Block(stats, matchEndDef) if opt.virtPatmat && (stats forall treeInfo.hasSynthCaseSymbol) =>
         // the assumption is once we encounter a case, the remainder of the block will consist of cases
         // the prologue may be empty, usually it is the valdef that stores the scrut
         val (prologue, cases) = stats span (s => !s.isInstanceOf[LabelDef])
         caseVirtualizedMatchOpt(matchExpr, prologue, cases, matchEndDef, identity)
       // optimized version of virtpatmat
-      case Block(outerStats, orig@Block(stats, matchEndDef)) if opt.virtPatmat && (stats forall hasSynthCaseSymbol) =>
+      case Block(outerStats, orig@Block(stats, matchEndDef)) if opt.virtPatmat && (stats forall treeInfo.hasSynthCaseSymbol) =>
         val (prologue, cases) = stats span (s => !s.isInstanceOf[LabelDef])
         caseVirtualizedMatchOpt(matchExpr, prologue, cases, matchEndDef, m => copyBlock(matchExpr, outerStats, m))
       case other =>
@@ -213,17 +211,14 @@ abstract class TreeGen extends reflect.internal.TreeGen with TreeDSL {
   def wildcardStar(tree: Tree) =
     atPos(tree.pos) { Typed(tree, Ident(tpnme.WILDCARD_STAR)) }
 
-  def paramToArg(vparam: Symbol) = {
-    val arg = Ident(vparam)
-    if (isRepeatedParamType(vparam.tpe)) wildcardStar(arg)
-    else arg
-  }
+  def paramToArg(vparam: Symbol): Tree =
+    paramToArg(Ident(vparam), isRepeatedParamType(vparam.tpe))
 
-  def paramToArg(vparam: ValDef) = {
-    val arg = Ident(vparam.name)
-    if (treeInfo.isRepeatedParamType(vparam.tpt)) wildcardStar(arg)
-    else arg
-  }
+  def paramToArg(vparam: ValDef): Tree =
+    paramToArg(Ident(vparam.name), treeInfo.isRepeatedParamType(vparam.tpt))
+
+  def paramToArg(arg: Ident, isRepeatedParam: Boolean): Tree  =
+    if (isRepeatedParam) wildcardStar(arg) else arg
 
   /** Make forwarder to method `target`, passing all parameters in `params` */
   def mkForwarder(target: Tree, vparamss: List[List[Symbol]]) =
