@@ -1,5 +1,5 @@
 /* NSC -- new Scala compiler
- * Copyright 2005-2011 LAMP/EPFL
+ * Copyright 2005-2012 LAMP/EPFL
  * @author  Martin Odersky
  */
 
@@ -987,6 +987,15 @@ trait Namers extends MethodSynthesis {
       // hence we make use of that and let them have whatever right-hand side they need
       // (either "macro ???" as they used to or just "???" to maximally simplify their compilation)
       if (fastTrack contains ddef.symbol) ddef.symbol setFlag MACRO
+
+      // macro defs need to be typechecked in advance
+      // because @macroImpl annotation only gets assigned during typechecking
+      // otherwise macro defs wouldn't be able to robustly coexist with their clients
+      // because a client could be typechecked before a macro def that it uses
+      if (ddef.symbol.isTermMacro) {
+        val pt = resultPt.substSym(tparamSyms, tparams map (_.symbol))
+        typer.computeMacroDefType(ddef, pt)
+      }
 
       thisMethodType({
         val rt = (

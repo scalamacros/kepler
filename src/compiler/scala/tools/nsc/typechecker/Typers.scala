@@ -1,5 +1,5 @@
 /* NSC -- new Scala compiler
- * Copyright 2005-2011 LAMP/EPFL
+ * Copyright 2005-2012 LAMP/EPFL
  * @author  Martin Odersky
  */
 
@@ -92,8 +92,8 @@ trait Typers extends Modes with Adaptations with Tags {
   // when true:
   //  - we may virtualize matches (if -Xexperimental and there's a suitable __match in scope)
   //  - we synthesize PartialFunction implementations for `x => x match {...}` and `match {...}` when the expected type is PartialFunction
-  // this is disabled by: -Xoldpatmat, scaladoc or interactive compilation
-  @inline private def newPatternMatching = opt.virtPatmat && !forScaladoc && !forInteractive // && (phase.id < currentRun.uncurryPhase.id)
+  // this is disabled by: -Xoldpatmat or interactive compilation (we run it for scaladoc due to SI-5933)
+  @inline private def newPatternMatching = opt.virtPatmat && !forInteractive //&& !forScaladoc && (phase.id < currentRun.uncurryPhase.id)
 
   abstract class Typer(context0: Context) extends TyperDiagnostics with Adaptation with Tag with TyperContextErrors {
     import context0.unit
@@ -1551,10 +1551,15 @@ trait Typers extends Modes with Adaptations with Tags {
      */
     def validateParentClasses(parents: List[Tree], selfType: Type) {
       val pending = ListBuffer[AbsTypeError]()
-      def validateParentClass(parent: Tree, superclazz: Symbol) {
+      @inline def validateDynamicParent(parent: Symbol) =
+        if (parent == DynamicClass) checkFeature(parent.pos, DynamicsFeature)
+
+      def validateParentClass(parent: Tree, superclazz: Symbol) =
         if (!parent.isErrorTyped) {
           val psym = parent.tpe.typeSymbol.initialize
+
           checkStablePrefixClassType(parent)
+
           if (psym != superclazz) {
             if (psym.isTrait) {
               val ps = psym.info.parents
@@ -1564,6 +1569,7 @@ trait Typers extends Modes with Adaptations with Tags {
               pending += ParentNotATraitMixinError(parent, psym)
             }
           }
+
           if (psym.isFinal)
             pending += ParentFinalInheritanceError(parent, psym)
 
@@ -1586,12 +1592,17 @@ trait Typers extends Modes with Adaptations with Tags {
             pending += ParentSelfTypeConformanceError(parent, selfType)
             if (settings.explaintypes.value) explainTypes(selfType, parent.tpe.typeOfThis)
           }
+
           if (parents exists (p => p != parent && p.tpe.typeSymbol == psym && !psym.isError))
             pending += ParentInheritedTwiceError(parent, psym)
+
+          validateDynamicParent(psym)
         }
+
+      if (!parents.isEmpty && parents.forall(!_.isErrorTyped)) {
+        val superclazz = parents.head.tpe.typeSymbol
+        for (p <- parents) validateParentClass(p, superclazz)
       }
-      if (!parents.isEmpty && parents.forall(!_.isErrorTyped))
-        for (p <- parents) validateParentClass(p, parents.head.tpe.typeSymbol)
 
 /*
       if (settings.Xshowcls.value != "" &&
@@ -2286,7 +2297,7 @@ trait Typers extends Modes with Adaptations with Tags {
         // but not in real life (i.e., now that's we've reset the method's type skolems'
         //   infos back to their pre-GADT-constraint state)
         if (isFullyDefined(pt) && !(body1.tpe <:< pt))
-          body1 = typedPos(body1.pos)(gen.mkCast(body1, pt))
+          body1 = typedPos(body1.pos)(gen.mkCast(body1, pt.normalize))
 
       }
 
@@ -2633,7 +2644,6 @@ trait Typers extends Modes with Adaptations with Tags {
       def includesTargetPos(tree: Tree) =
         tree.pos.isRange && context.unit.exists && (tree.pos includes context.unit.targetPos)
       val localTarget = stats exists includesTargetPos
-      val statsErrors = scala.collection.mutable.LinkedHashSet[AbsTypeError]()
       def typedStat(stat: Tree): Tree = {
         if (context.owner.isRefinementClass && !treeInfo.isDeclarationOrTypeDef(stat))
           OnlyDeclarationsError(stat)
@@ -2652,7 +2662,6 @@ trait Typers extends Modes with Adaptations with Tags {
                 stat
               } else {
                 val localTyper = if (inBlock || (stat.isDef && !stat.isInstanceOf[LabelDef])) {
-                  context.flushBuffer()
                   this
                 } else newTyper(context.make(stat, exprOwner))
                 // XXX this creates a spurious dead code warning if an exception is thrown
@@ -2669,7 +2678,6 @@ trait Typers extends Modes with Adaptations with Tags {
                   "a pure expression does nothing in statement position; " +
                   "you may be omitting necessary parentheses"
                 )
-                statsErrors ++= localTyper.context.errBuffer
                 result
               }
           }
@@ -2752,12 +2760,7 @@ trait Typers extends Modes with Adaptations with Tags {
         }
       }
 
-      val stats1 = withSavedContext(context) {
-        val result = stats mapConserve typedStat
-        context.flushBuffer()
-        result
-      }
-      context.updateBuffer(statsErrors)
+      val stats1 = stats mapConserve typedStat
       if (phase.erasedTypes) stats1
       else {
         checkNoDoubleDefs(stats1)
@@ -3041,7 +3044,19 @@ trait Typers extends Modes with Adaptations with Tags {
               // target of a call.  Since this information is no longer available from
               // typedArg, it is recorded here.
               checkDead.updateExpr(fun)
-              val args1 = typedArgs(args, forArgMode(fun, mode), paramTypes, formals)
+
+              val args1 =
+                // no expected type when jumping to a match label -- anything goes (this is ok since we're typing the translation of well-typed code)
+                // ... except during erasure: we must take the expected type into account as it drives the insertion of casts!
+                // I've exhausted all other semi-clean approaches I could think of in balancing GADT magic, SI-6145, CPS type-driven transforms and other existential trickiness
+                // (the right thing to do -- packing existential types -- runs into limitations in subtyping existential types,
+                //  casting breaks SI-6145,
+                //  not casting breaks GADT typing as it requires sneaking ill-typed trees past typer)
+                if (!phase.erasedTypes && fun.symbol.isLabel && treeInfo.isSynthCaseSymbol(fun.symbol))
+                  typedArgs(args, forArgMode(fun, mode))
+                else
+                  typedArgs(args, forArgMode(fun, mode), paramTypes, formals)
+
               // instantiate dependent method types, must preserve singleton types where possible (stableTypeFor) -- example use case:
               // val foo = "foo"; def precise(x: String)(y: x.type): x.type = {...}; val bar : foo.type = precise(foo)(foo)
               // precise(foo) : foo.type => foo.type
@@ -3220,7 +3235,7 @@ trait Typers extends Modes with Adaptations with Tags {
       // we don't create a new Context for a Match, so find the CaseDef, then go out one level and navigate back to the match that has this case
       // val thisCase = context.nextEnclosing(_.tree.isInstanceOf[CaseDef])
       // val unchecked = thisCase.outer.tree.collect{case Match(selector, cases) if cases contains thisCase => selector} match {
-      //   case List(Typed(_, tpt)) if treeInfo.isUncheckedAnnotation(tpt.tpe) => true
+      //   case List(Typed(_, tpt)) if tpt.tpe hasAnnotation UncheckedClass => true
       //   case t => println("outer tree: "+ (t, thisCase, thisCase.outer.tree)); false
       // }
       // println("wrapClassTagUnapply"+ (!isPastTyper && infer.containsUnchecked(pt), pt, uncheckedPattern))
@@ -4522,7 +4537,9 @@ trait Typers extends Modes with Adaptations with Tags {
                 }) setType qual.tpe setPos qual.pos,
                 name)
             case _ if accessibleError.isDefined =>
-              val qual1 = adaptToMemberWithArgs(tree, qual, name, mode, false, false)
+              // don't adapt constructor, SI-6074
+              val qual1 = if (name == nme.CONSTRUCTOR) qual
+                          else adaptToMemberWithArgs(tree, qual, name, mode, false, false)
               if (!qual1.isErrorTyped && (qual1 ne qual))
                 typed(Select(qual1, name) setPos tree.pos, mode, pt)
               else
@@ -5027,10 +5044,11 @@ trait Typers extends Modes with Adaptations with Tags {
 
           if (isPatternMode) {
             val uncheckedTypeExtractor = extractorForUncheckedType(tpt.pos, tptTyped.tpe)
-            val ownType = inferTypedPattern(tptTyped, tptTyped.tpe, pt, canRemedy = uncheckedTypeExtractor.nonEmpty)
-            // println(s"Typed($expr, ${tpt.tpe}) : $pt --> $ownType  (${isFullyDefined(ownType)}, ${makeFullyDefined(ownType)})")
+
             // make fully defined to avoid bounded wildcard types that may be in pt from calling dropExistential (SI-2038)
-            treeTyped setType (if (isFullyDefined(ownType)) ownType else makeFullyDefined(ownType)) //ownType
+            val ptDefined = if (isFullyDefined(pt)) pt else makeFullyDefined(pt)
+            val ownType   = inferTypedPattern(tptTyped, tptTyped.tpe, ptDefined, canRemedy = uncheckedTypeExtractor.nonEmpty)
+            treeTyped setType ownType
 
             uncheckedTypeExtractor match {
               case None => treeTyped
