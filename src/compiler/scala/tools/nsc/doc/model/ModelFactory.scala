@@ -493,11 +493,16 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         if (entity != default) return entity
       }
       // query linearization
-      for (tpl <- linearizationTemplates.collect{ case dtpl: DocTemplateImpl if dtpl!=this => dtpl}) {
-        val entity = tpl.groupSearch(extractor, default)
-        if (entity != default) return entity
-      }
-      default
+      if (!sym.isPackage)
+        for (tpl <- linearizationTemplates.collect{ case dtpl: DocTemplateImpl if dtpl!=this => dtpl}) {
+          val entity = tpl.groupSearch(extractor, default)
+          if (entity != default) return entity
+        }
+      // query inTpl, going up the ownerChain
+      if (inTpl != null)
+        inTpl.groupSearch(extractor, default)
+      else
+        default
     }
 
     def groupDescription(group: String): Option[Body] = groupSearch(_.groupDesc.get(group), None)
