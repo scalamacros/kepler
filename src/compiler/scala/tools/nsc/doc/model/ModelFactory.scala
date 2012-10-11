@@ -32,8 +32,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
   import rootMirror.{ RootPackage, RootClass, EmptyPackage }
 
   // Defaults for member grouping, that may be overridden by the template
-  val defaultGroup = "default"
-  val defaultGroupName = "Other Members"
+  val defaultGroup = "Ungrouped"
+  val defaultGroupName = "Ungrouped"
   val defaultGroupDesc = None
   val defaultGroupPriority = 1000
 
@@ -292,7 +292,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         val tps = (this match {
           case a: AliasType => sym.tpe.dealias.parents
           case a: AbstractType => sym.info.bounds match {
-            case TypeBounds(lo, hi) => List(hi)
+            case TypeBounds(lo, RefinedType(parents, decls)) => parents
+            case TypeBounds(lo, hi) => hi :: Nil
             case _ => Nil
           }
           case _ => sym.tpe.parents
@@ -747,7 +748,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
           }
       else {
         // no class inheritance at this point
-        assert(inOriginalOwner(bSym, inTpl) || bSym.isAbstractType || bSym.isAliasType, bSym + " in " + inTpl)
+        assert(inOriginalOwner(bSym, inTpl), bSym + " in " + inTpl)
         Some(createDocTemplate(bSym, inTpl))
       }
     }
@@ -844,7 +845,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
         Some(new MemberTemplateImpl(bSym, inTpl) with AliasImpl with AliasType {
           override def isAliasType = true
         })
-      else if (!modelFinished && (bSym.isPackage || bSym.isAliasType || bSym.isAbstractType || templateShouldDocument(bSym, inTpl)))
+      else if (!modelFinished && (bSym.isPackage || templateShouldDocument(bSym, inTpl)))
         modelCreation.createTemplate(bSym, inTpl)
       else
         None
@@ -1051,8 +1052,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
   def inOriginalOwner(aSym: Symbol, inTpl: TemplateImpl): Boolean =
     normalizeTemplate(aSym.owner) == normalizeTemplate(inTpl.sym)
 
-  def templateShouldDocument(aSym: Symbol, inTpl: TemplateImpl): Boolean =
-    (aSym.isTrait || aSym.isClass || aSym.isModule) &&
+  def templateShouldDocument(aSym: Symbol, inTpl: DocTemplateImpl): Boolean =
+    (aSym.isTrait || aSym.isClass || aSym.isModule || typeShouldDocument(aSym, inTpl)) &&
     localShouldDocument(aSym) &&
     !isEmptyJavaObject(aSym) &&
     // either it's inside the original owner or we can document it later:
@@ -1092,6 +1093,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
   // whether or not to create a page for an {abstract,alias} type
   def typeShouldDocument(bSym: Symbol, inTpl: DocTemplateImpl) =
     (settings.docExpandAllTypes.value && (bSym.sourceFile != null)) ||
+    (bSym.isAliasType || bSym.isAbstractType) &&
     { val rawComment = global.expandedDocComment(bSym, inTpl.sym)
       rawComment.contains("@template") || rawComment.contains("@documentable") }
 
