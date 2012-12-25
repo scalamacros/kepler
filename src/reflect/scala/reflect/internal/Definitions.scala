@@ -447,6 +447,7 @@ trait Definitions extends api.StandardDefinitions {
     // collections classes
     lazy val ConsClass          = requiredClass[scala.collection.immutable.::[_]]
     lazy val IteratorClass      = requiredClass[scala.collection.Iterator[_]]
+    lazy val IterableClass      = requiredClass[scala.collection.Iterable[_]]
     lazy val ListClass          = requiredClass[scala.collection.immutable.List[_]]
     lazy val SeqClass           = requiredClass[scala.collection.Seq[_]]
     lazy val StringBuilderClass = requiredClass[scala.collection.mutable.StringBuilder]
