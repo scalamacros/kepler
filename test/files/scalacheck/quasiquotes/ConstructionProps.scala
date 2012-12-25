@@ -54,6 +54,15 @@ object ConstructionProps extends Properties("construction")
     q"$t1($t2, $t3)" ≈ Apply(t1, List(t2, t3))
   }
 
+  property("splice trees with .. cardinality into apply") = forAll { (ts: List[Tree]) =>
+    q"f(..$ts)" ≈ Apply(q"f", ts)
+  }
+
+  property("splice trees with ... cardinality into apply") = forAll { (ts1: List[Tree], ts2: List[Tree]) =>
+    val argss = List(ts1, ts2)
+    q"f(...$argss)" ≈ Apply(Apply(q"f", ts1), ts2)
+  }
+
   property("splice term name into assign") = forAll { (name: TermName, t: Tree) =>
     q"$name = $t" ≈ Assign(Ident(name), t)
   }

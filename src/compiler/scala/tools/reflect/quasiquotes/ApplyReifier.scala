@@ -6,6 +6,7 @@ import scala.reflect.macros
 
 abstract class ApplyReifier extends ReflectReifier with Types {
   import global._
+  import global.Flag._
 
   val subsmap: Map[String, (Tree, String)]
   val ctx: macros.Context
@@ -73,11 +74,10 @@ abstract class ApplyReifier extends ReflectReifier with Types {
 
   override def reifyTree(tree: Tree) = reifyBasicTree(tree)
 
-  override def reifyBasicTree(tree: Tree): Tree = {
-    tree match {
-      case SimpleTree(SubsToTree(tree, card)) => tree
-      case _ => super.reifyBasicTree(tree)
-    }
+  override def reifyBasicTree(tree: Tree): Tree = tree match {
+    case SimpleTree(SubsToTree(tree, "")) => tree
+    case Apply(f, List(SimpleTree(SubsToTree(argss, "...")))) => reifyMultiApply(f, argss)
+    case _ => super.reifyBasicTree(tree)
   }
 
   override def reifyName(name: Name): Tree =
@@ -92,9 +92,25 @@ abstract class ApplyReifier extends ReflectReifier with Types {
   override def reifyList(xs: List[Any]): Tree =
     Select(
       mkList(xs.map {
-        case SimpleTree(SubsToTree(tree, card)) if card == ".." => tree
-        case List(SimpleTree(SubsToTree(tree, card))) if card == "..." => tree
+        case SimpleTree(SubsToTree(tree, "..")) => tree
+        case List(SimpleTree(SubsToTree(tree, "..."))) => tree
         case x @ _ => mkList(List(reify(x)))
       }),
       TermName("flatten"))
+
+  def reifyMultiApply(f: Tree, argss: Tree) =
+    Apply(
+      Apply(
+        TypeApply(
+          Select(argss, TermName("foldLeft")),
+          List(Select(Ident(nme.UNIVERSE_SHORT), TypeName("Tree")))),
+        List(reifyTree(f))),
+      List(
+        Function(
+          List(
+            ValDef(Modifiers(PARAM), TermName("f"), TypeTree(), EmptyTree),
+            ValDef(Modifiers(PARAM), TermName("args"), TypeTree(), EmptyTree)),
+          Apply(
+            Select(Ident(nme.UNIVERSE_SHORT), TermName("Apply")),
+            List(Ident(TermName("f")), Ident(TermName("args")))))))
 }
