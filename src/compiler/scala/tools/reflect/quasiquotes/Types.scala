@@ -17,9 +17,10 @@ trait Types {
   lazy val treeType = memberType(universeType, "Tree")
   lazy val typeDefType = memberType(universeType, "TypeDef")
   lazy val liftableType = rootMirror.staticClass("scala.reflect.api.Liftable").toType
+  lazy val iterableTreeType = appliedType(IterableClass.toType, List(treeType))
+  lazy val iterableIterableTreeType = appliedType(IterableClass.toType, List(iterableTreeType))
   lazy val listTreeType = appliedType(ListClass.toType, List(treeType))
   lazy val listListTreeType = appliedType(ListClass.toType, List(listTreeType))
-  lazy val typeDefListType = appliedType(ListClass.toType, List(typeDefType))
   lazy val optionTreeType = appliedType(OptionClass.toType, List(treeType))
   lazy val optionNameType = appliedType(OptionClass.toType, List(nameType))
 

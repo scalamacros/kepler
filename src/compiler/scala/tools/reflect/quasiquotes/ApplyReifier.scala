@@ -40,14 +40,14 @@ abstract class ApplyReifier extends ReflectReifier with Types {
           if (card != "")
             throw new Exception(s"Incorrect cardinality, expected '', got '$card'")
           Some((tree, card))
-        } else if (tree.tpe <:< listTreeType) {
+        } else if (tree.tpe <:< iterableTreeType) {
           if (card != "..")
             throw new Exception(s"Incorrect cardinality, expected '..', but got '$card'")
-          Some((tree, card))
-        } else if (tree.tpe <:< listListTreeType) {
+          Some((reifyIterableTree(tree), card))
+        } else if (tree.tpe <:< iterableIterableTreeType) {
           if (card != "...")
             throw new Exception(s"Incorrect cardinality, expected '...', but got '$card'")
-          Some((tree, card))
+          Some((reifyIterableIterableTree(tree), card))
         } else {
           val liftType = appliedType(liftableType, List(tree.tpe))
           val lift = ctx.inferImplicitValue(liftType.asInstanceOf[ctx.Type], silent = true).asInstanceOf[Tree]
@@ -113,4 +113,16 @@ abstract class ApplyReifier extends ReflectReifier with Types {
           Apply(
             Select(Ident(nme.UNIVERSE_SHORT), TermName("Apply")),
             List(Ident(TermName("f")), Ident(TermName("args")))))))
+
+  def reifyIterableTree(tree: Tree) =
+    Select(tree, TermName("toList"))
+
+  def reifyIterableIterableTree(tree: Tree) =
+    Select(
+      Apply(
+        Select(tree, TermName("map")),
+        List(Function(
+          List(ValDef(Modifiers(PARAM), TermName("x$1"), TypeTree(), EmptyTree)),
+          Select(Ident(TermName("x$1")), TermName("toList"))))),
+      TermName("toList"))
 }

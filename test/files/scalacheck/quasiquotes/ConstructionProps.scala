@@ -58,6 +58,11 @@ object ConstructionProps extends Properties("construction")
     q"f(..$ts)" ≈ Apply(q"f", ts)
   }
 
+  property("splice iterable into apply") = forAll { (trees: List[Tree]) =>
+    val itrees: Iterable[Tree] = trees
+    q"f(..$itrees)" ≈ Apply(q"f", trees)
+  }
+
   property("splice trees with ... cardinality into apply") = forAll { (ts1: List[Tree], ts2: List[Tree]) =>
     val argss = List(ts1, ts2)
     q"f(...$argss)" ≈ Apply(Apply(q"f", ts1), ts2)
