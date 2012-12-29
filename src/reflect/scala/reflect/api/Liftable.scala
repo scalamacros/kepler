@@ -9,7 +9,7 @@ trait Liftable[T] {
 object Liftable {
 
   private class LiftableConstant[T] extends Liftable[T] {
-    def apply(universe: api.Universe, value: T): universe.Tree =
+    def apply(universe: Universe, value: T): universe.Tree =
       universe.Literal(universe.Constant(value))
   }
 
@@ -22,4 +22,5 @@ object Liftable {
   implicit lazy val liftDouble: Liftable[Double] = new LiftableConstant[Double]
   implicit lazy val liftBoolean: Liftable[Boolean] = new LiftableConstant[Boolean]
   implicit lazy val liftString: Liftable[String] = new LiftableConstant[String]
+  implicit lazy val liftUnit: Liftable[Unit] = new LiftableConstant[Unit]
 }

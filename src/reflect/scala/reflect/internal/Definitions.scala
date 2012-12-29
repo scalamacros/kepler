@@ -447,6 +447,7 @@ trait Definitions extends api.StandardDefinitions {
     // collections classes
     lazy val ConsClass          = requiredClass[scala.collection.immutable.::[_]]
     lazy val IteratorClass      = requiredClass[scala.collection.Iterator[_]]
+    lazy val IterableClass      = requiredClass[scala.collection.Iterable[_]]
     lazy val ListClass          = requiredClass[scala.collection.immutable.List[_]]
     lazy val SeqClass           = requiredClass[scala.collection.Seq[_]]
     lazy val StringBuilderClass = requiredClass[scala.collection.mutable.StringBuilder]
@@ -527,12 +528,13 @@ trait Definitions extends api.StandardDefinitions {
     lazy val StringContextClass                  = requiredClass[scala.StringContext]
          def StringContext_f                     = getMemberMethod(StringContextClass, nme.f)
 
-    lazy val QuasiQuoteClass           = if (ApiUniverseClass != NoSymbol) getMember(ApiUniverseClass, newTypeName("QuasiQuote")) else NoSymbol
-    lazy val QuasiQuoteClass_q         = if (QuasiQuoteClass != NoSymbol) getMember(QuasiQuoteClass, newTermName("q")) else NoSymbol
-    lazy val QuasiQuoteClass_q_apply   = if (QuasiQuoteClass_q != NoSymbol) getMember(QuasiQuoteClass_q, newTermName("apply")) else NoSymbol
-    lazy val QuasiQuoteClass_q_unapply = if (QuasiQuoteClass_q != NoSymbol) getMember(QuasiQuoteClass_q, newTermName("unapply")) else NoSymbol
-    lazy val QuasiQuoteClass_tq        = if (QuasiQuoteClass != NoSymbol) getMember(QuasiQuoteClass, newTermName("tq")) else NoSymbol
-    lazy val QuasiQuoteClass_tq_apply  = if (QuasiQuoteClass_tq != NoSymbol) getMember(QuasiQuoteClass_tq, newTermName("apply")) else NoSymbol
+    lazy val QuasiQuoteClass            = if (ApiUniverseClass != NoSymbol) getMember(ApiUniverseClass, newTypeName("QuasiQuote")) else NoSymbol
+    lazy val QuasiQuoteClass_q          = if (QuasiQuoteClass != NoSymbol) getMember(QuasiQuoteClass, newTermName("q")) else NoSymbol
+    lazy val QuasiQuoteClass_q_apply    = if (QuasiQuoteClass_q != NoSymbol) getMember(QuasiQuoteClass_q, newTermName("apply")) else NoSymbol
+    lazy val QuasiQuoteClass_q_unapply  = if (QuasiQuoteClass_q != NoSymbol) getMember(QuasiQuoteClass_q, newTermName("unapply")) else NoSymbol
+    lazy val QuasiQuoteClass_tq         = if (QuasiQuoteClass != NoSymbol) getMember(QuasiQuoteClass, newTermName("tq")) else NoSymbol
+    lazy val QuasiQuoteClass_tq_apply   = if (QuasiQuoteClass_tq != NoSymbol) getMember(QuasiQuoteClass_tq, newTermName("apply")) else NoSymbol
+    lazy val QuasiQuoteClass_tq_unapply = if (QuasiQuoteClass_tq != NoSymbol) getMember(QuasiQuoteClass_tq, newTermName("unapply")) else NoSymbol
 
     lazy val ScalaSignatureAnnotation = requiredClass[scala.reflect.ScalaSignature]
     lazy val ScalaLongSignatureAnnotation = requiredClass[scala.reflect.ScalaLongSignature]

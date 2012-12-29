@@ -6,9 +6,9 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object ConstructionProps extends Properties("construction")
-                            with TreeSimiliarity
-                            with ArbitraryTreesAndNames {
+object TermConstructionProps extends Properties("construction")
+                                with TreeSimiliarity
+                                with ArbitraryTreesAndNames {
 
   val anyRef = Select(Ident(TermName("scala")), TypeName("AnyRef"))
 
@@ -52,6 +52,20 @@ object ConstructionProps extends Properties("construction")
 
   property("splice trees into apply") = forAll { (t1: Tree, t2: Tree, t3: Tree) =>
     q"$t1($t2, $t3)" ≈ Apply(t1, List(t2, t3))
+  }
+
+  property("splice trees with .. cardinality into apply") = forAll { (ts: List[Tree]) =>
+    q"f(..$ts)" ≈ Apply(q"f", ts)
+  }
+
+  property("splice iterable into apply") = forAll { (trees: List[Tree]) =>
+    val itrees: Iterable[Tree] = trees
+    q"f(..$itrees)" ≈ Apply(q"f", trees)
+  }
+
+  property("splice trees with ... cardinality into apply") = forAll { (ts1: List[Tree], ts2: List[Tree]) =>
+    val argss = List(ts1, ts2)
+    q"f(...$argss)" ≈ Apply(Apply(q"f", ts1), ts2)
   }
 
   property("splice term name into assign") = forAll { (name: TermName, t: Tree) =>

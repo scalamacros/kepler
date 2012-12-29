@@ -128,7 +128,7 @@ abstract class UnapplyQMacro extends Types { self =>
     val parser = new {
       val global: ctx.universe.type = ctx.universe
       val placeholders = self.placeholders.keys.toSet
-    } with Parser
+    } with QParser
     parser.parse(code)
   }
 

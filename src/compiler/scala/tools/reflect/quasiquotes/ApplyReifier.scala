@@ -6,6 +6,7 @@ import scala.reflect.macros
 
 abstract class ApplyReifier extends ReflectReifier with Types {
   import global._
+  import global.Flag._
 
   val subsmap: Map[String, (Tree, String)]
   val ctx: macros.Context
@@ -39,14 +40,14 @@ abstract class ApplyReifier extends ReflectReifier with Types {
           if (card != "")
             throw new Exception(s"Incorrect cardinality, expected '', got '$card'")
           Some((tree, card))
-        } else if (tree.tpe <:< listTreeType) {
+        } else if (tree.tpe <:< iterableTreeType) {
           if (card != "..")
             throw new Exception(s"Incorrect cardinality, expected '..', but got '$card'")
-          Some((tree, card))
-        } else if (tree.tpe <:< listListTreeType) {
+          Some((reifyIterableTree(tree), card))
+        } else if (tree.tpe <:< iterableIterableTreeType) {
           if (card != "...")
             throw new Exception(s"Incorrect cardinality, expected '...', but got '$card'")
-          Some((tree, card))
+          Some((reifyIterableIterableTree(tree), card))
         } else {
           val liftType = appliedType(liftableType, List(tree.tpe))
           val lift = ctx.inferImplicitValue(liftType.asInstanceOf[ctx.Type], silent = true).asInstanceOf[Tree]
@@ -73,11 +74,10 @@ abstract class ApplyReifier extends ReflectReifier with Types {
 
   override def reifyTree(tree: Tree) = reifyBasicTree(tree)
 
-  override def reifyBasicTree(tree: Tree): Tree = {
-    tree match {
-      case SimpleTree(SubsToTree(tree, card)) => tree
-      case _ => super.reifyBasicTree(tree)
-    }
+  override def reifyBasicTree(tree: Tree): Tree = tree match {
+    case SimpleTree(SubsToTree(tree, "")) => tree
+    case Apply(f, List(SimpleTree(SubsToTree(argss, "...")))) => reifyMultiApply(f, argss)
+    case _ => super.reifyBasicTree(tree)
   }
 
   override def reifyName(name: Name): Tree =
@@ -92,9 +92,37 @@ abstract class ApplyReifier extends ReflectReifier with Types {
   override def reifyList(xs: List[Any]): Tree =
     Select(
       mkList(xs.map {
-        case SimpleTree(SubsToTree(tree, card)) if card == ".." => tree
-        case List(SimpleTree(SubsToTree(tree, card))) if card == "..." => tree
+        case SimpleTree(SubsToTree(tree, "..")) => tree
+        case List(SimpleTree(SubsToTree(tree, "..."))) => tree
         case x @ _ => mkList(List(reify(x)))
       }),
       TermName("flatten"))
+
+  def reifyMultiApply(f: Tree, argss: Tree) =
+    Apply(
+      Apply(
+        TypeApply(
+          Select(argss, TermName("foldLeft")),
+          List(Select(Ident(nme.UNIVERSE_SHORT), TypeName("Tree")))),
+        List(reifyTree(f))),
+      List(
+        Function(
+          List(
+            ValDef(Modifiers(PARAM), TermName("f"), TypeTree(), EmptyTree),
+            ValDef(Modifiers(PARAM), TermName("args"), TypeTree(), EmptyTree)),
+          Apply(
+            Select(Ident(nme.UNIVERSE_SHORT), TermName("Apply")),
+            List(Ident(TermName("f")), Ident(TermName("args")))))))
+
+  def reifyIterableTree(tree: Tree) =
+    Select(tree, TermName("toList"))
+
+  def reifyIterableIterableTree(tree: Tree) =
+    Select(
+      Apply(
+        Select(tree, TermName("map")),
+        List(Function(
+          List(ValDef(Modifiers(PARAM), TermName("x$1"), TypeTree(), EmptyTree)),
+          Select(Ident(TermName("x$1")), TermName("toList"))))),
+      TermName("toList"))
 }

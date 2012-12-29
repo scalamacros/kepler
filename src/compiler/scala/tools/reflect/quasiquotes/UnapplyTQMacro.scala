@@ -1,14 +1,14 @@
 package scala.tools.reflect
 package quasiquotes
 
-abstract class ApplyTQMacro extends ApplyQMacro { self =>
+abstract class UnapplyTQMacro extends UnapplyQMacro { self =>
   import ctx.universe._
 
   override def parse(code: String) = {
     val parser = new {
       val global: ctx.universe.type = ctx.universe
-      val placeholders = self.subsmap.keys.toSet
-    } with TQParser
+      val placeholders = self.placeholders.keys.toSet
+    } with QParser
     parser.parse(code)
   }
 }

@@ -25,7 +25,7 @@ abstract class ApplyQMacro { self =>
     }
 
   val (code, subsmap) = {
-    val sb = new StringBuilder(codePrefix)
+    val sb = new StringBuilder()
     val subsmap = mutable.Map[String, (Tree, String)]()
 
     foreach2(args, parts.init) { (tree, p) =>
@@ -52,7 +52,7 @@ abstract class ApplyQMacro { self =>
 
   if (settings.Yquasiquotedebug.value) println(s"parsed tree\n=${tree}\n=${showRaw(tree)}\n")
 
-  val reified = reifyTree(beforeReify(tree))
+  val reified = reifyTree(tree)
 
   if (settings.Yquasiquotedebug.value) println(s"reified tree\n=${reified}\n=${showRaw(reified)}\n")
 
@@ -64,11 +64,9 @@ abstract class ApplyQMacro { self =>
     val parser = new {
       val global: ctx.universe.type = ctx.universe
       val placeholders = self.subsmap.keys.toSet
-    } with Parser
+    } with QParser
     parser.parse(code)
   }
-
-  def beforeReify(tree: Tree) = tree
 
   def reifyTree(tree: Tree) = {
     val ctx0 = ctx
