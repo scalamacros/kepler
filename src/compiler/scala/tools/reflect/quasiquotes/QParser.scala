@@ -3,22 +3,28 @@ package quasiquotes
 
 import scala.tools.nsc.ast.parser.{Parsers => ScalaParser}
 import scala.tools.nsc.ast.parser.Tokens._
-import scala.compat.Platform.EOL
 import scala.reflect.internal.util.{BatchSourceFile, SourceFile}
+import scala.compat.Platform.EOL
 
-abstract class Parser extends ScalaParser {
+abstract class QParser extends ScalaParser {
   import global._
   val placeholders: Set[String]
 
-  def parse(code: String): Tree = {
-    val wrappedCode = "object wrapper {" + EOL + code + EOL + "}"
-    val file = new BatchSourceFile("<quasiquotes>", wrappedCode)
-    val wrappedTree = new QuasiQuoteParser(file).parse()
+  def wrapCode(code: String): String =
+    "object wrapper {" + EOL + code + EOL + "}"
+
+  def unwrapTree(wrappedTree: Tree): Tree = {
     val PackageDef(_, List(ModuleDef(_, _, Template(_, _, _ :: parsed)))) = wrappedTree
     parsed match {
       case tree :: Nil => tree
       case stats :+ tree => Block(stats, tree)
     }
+  }
+
+  def parse(code: String): Tree = {
+    val file = new BatchSourceFile("<quasiquotes>", wrapCode(code))
+    val tree = new QuasiQuoteParser(file).parse()
+    unwrapTree(tree)
   }
 
   class QuasiQuoteParser(source0: SourceFile) extends SourceFileParser(source0) {
@@ -46,3 +52,5 @@ abstract class Parser extends ScalaParser {
     }
   }
 }
+
+

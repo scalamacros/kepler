@@ -6,9 +6,9 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object DeconstructionProps extends Properties("deconstruction")
-                              with TreeSimiliarity
-                              with ArbitraryTreesAndNames {
+object TermDeconstructionProps extends Properties("term deconstruction")
+                                  with TreeSimiliarity
+                                  with ArbitraryTreesAndNames {
 
   property("f(x)") = forAll { (x: Tree) =>
     val q"f($x1)" = q"f($x)"

@@ -39,6 +39,7 @@ trait FastTrack {
     QuasiQuoteClass_q_apply bindTo { case (c, _) => (new { val ctx: c.type = c } with quasiquotes.ApplyQMacro).result }
     QuasiQuoteClass_q_unapply bindTo { case (c, _) => (new { val ctx: c.type = c } with quasiquotes.UnapplyQMacro).result }
     QuasiQuoteClass_tq_apply bindTo { case (c, _) => (new { val ctx: c.type = c } with quasiquotes.ApplyTQMacro).result }
+    QuasiQuoteClass_tq_unapply bindTo { case (c, _) => (new { val ctx: c.type = c } with quasiquotes.UnapplyTQMacro).result }
     registry
   }
 }

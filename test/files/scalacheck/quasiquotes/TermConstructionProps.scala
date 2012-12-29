@@ -6,9 +6,9 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object ConstructionProps extends Properties("construction")
-                            with TreeSimiliarity
-                            with ArbitraryTreesAndNames {
+object TermConstructionProps extends Properties("construction")
+                                with TreeSimiliarity
+                                with ArbitraryTreesAndNames {
 
   val anyRef = Select(Ident(TermName("scala")), TypeName("AnyRef"))
 

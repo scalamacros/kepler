@@ -16,6 +16,9 @@ trait QuasiQuotes { self: Universe =>
       // implementation is hardwired to `scala.tools.reflect.quasiquotes.ApplyTQMacro`
       // using the mechanism implemented in `scala.tools.reflect.FastTrack`
       def apply(args: Any*): Any = ??? // macro
+      // implementation is hardwired to `scala.tools.reflect.quasiquotes.UnapplyTQMacro`
+      // using the mechanism implemented in `scala.tools.reflect.FastTrack`
+      def unapply(tree: Any): Option[Any] = ??? // macro
     }
   }
 
