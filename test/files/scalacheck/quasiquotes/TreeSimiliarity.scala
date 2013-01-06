@@ -154,6 +154,8 @@ trait TreeSimiliarity {
             apply(tparams1, tparams2) && apply(rhs1, rhs2)
           case (TypeTree(), TypeTree()) => true
           case (EmptyTree, EmptyTree) => true
+          case (DependentTypeTree(tpt1, args1), DependentTypeTree(tpt2, args2)) =>
+            apply(tpt1, tpt2) && apply(args1, args2)
           case _ => false
         }) || (ellipsis == t1) || (ellipsis == t2)
         if(!res) println("---\n" + showRaw(t1, printIds=true) + "\n=/=\n" + showRaw(t2, printIds=true) )

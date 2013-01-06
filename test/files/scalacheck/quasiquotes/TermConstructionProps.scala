@@ -6,9 +6,9 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object ConstructionProps extends Properties("construction")
-                            with TreeSimiliarity
-                            with ArbitraryTreesAndNames {
+object TermConstructionProps extends Properties("construction")
+                                with TreeSimiliarity
+                                with ArbitraryTreesAndNames {
 
   val anyRef = Select(Ident(TermName("scala")), TypeName("AnyRef"))
 
@@ -54,6 +54,20 @@ object ConstructionProps extends Properties("construction")
     q"$t1($t2, $t3)" ≈ Apply(t1, List(t2, t3))
   }
 
+  property("splice trees with .. cardinality into apply") = forAll { (ts: List[Tree]) =>
+    q"f(..$ts)" ≈ Apply(q"f", ts)
+  }
+
+  property("splice iterable into apply") = forAll { (trees: List[Tree]) =>
+    val itrees: Iterable[Tree] = trees
+    q"f(..$itrees)" ≈ Apply(q"f", trees)
+  }
+
+  property("splice trees with ... cardinality into apply") = forAll { (ts1: List[Tree], ts2: List[Tree]) =>
+    val argss = List(ts1, ts2)
+    q"f(...$argss)" ≈ Apply(Apply(q"f", ts1), ts2)
+  }
+
   property("splice term name into assign") = forAll { (name: TermName, t: Tree) =>
     q"$name = $t" ≈ Assign(Ident(name), t)
   }
@@ -81,46 +95,43 @@ object ConstructionProps extends Properties("construction")
     q"return $tree" ≈ Return(tree)
   }
 
-  // TODO: this test needs to be fixed
-  // property("splice a list of arguments") = forAll { (fun: Tree, args: List[Tree]) =>
-  //   q"$fun(..$args)" ≈ Apply(fun, args)
-  // }
+  property("splice a list of arguments") = forAll { (fun: Tree, args: List[Tree]) =>
+    q"$fun(..$args)" ≈ Apply(fun, args)
+  }
+
+  property("splice list and non-list fun arguments") = forAll { (fun: Tree, arg1: Tree, arg2: Tree, args: List[Tree]) =>
+    q"$fun(..$args, $arg1, $arg2)" ≈ Apply(fun, args ++ List(arg1) ++ List(arg2)) &&
+    q"$fun($arg1, ..$args, $arg2)" ≈ Apply(fun, List(arg1) ++ args ++ List(arg2)) &&
+    q"$fun($arg1, $arg2, ..$args)" ≈ Apply(fun, List(arg1) ++ List(arg2) ++ args)
+  }
+
+  property("splice members into class") = forAll { (name: TypeName, defs: List[DefDef], extra: DefDef) =>
+    q"""class $name {
+      ..$defs
+      $extra
+    }""" ≈ classWithMethods(name, defs ++ List(extra))
+  }
+
+  property("splice into new") = forAll { (name: TypeName, body: List[Tree]) =>
+    q"new $name { ..$body }" ≈
+      q"""{
+        final class $$anon extends $name {
+          ..$body
+        }
+        new $$anon
+      }"""
+  }
 
   // TODO: this test needs to be fixed
-  // property("splice list and non-list fun arguments") = forAll { (fun: Tree, arg1: Tree, arg2: Tree, args: List[Tree]) =>
-  //   q"$fun(..$args, $arg1, $arg2)" ≈ Apply(fun, args ++ List(arg1) ++ List(arg2)) &&
-  //   q"$fun($arg1, ..$args, $arg2)" ≈ Apply(fun, List(arg1) ++ args ++ List(arg2)) &&
-  //   q"$fun($arg1, $arg2, ..$args)" ≈ Apply(fun, List(arg1) ++ List(arg2) ++ args)
-  // }
-
-  // TODO: this test needs to be fixed
-  // property("splice members into class") = forAll { (name: TypeName, defs: List[DefDef], extra: DefDef) =>
-  //   q"""class $name {
-  //     ..$defs
-  //     $extra
-  //   }""" ≈ classWithMethods(name, defs ++ List(extra))
-  // }
-
-  // TODO: this test needs to be fixed
-  // property("splice into new") = forAll { (name: TypeName, body: List[Tree]) =>
-  //   q"new $name { ..$body }" ≈
-  //     q"""{
-  //       final class $$anon extends $name {
-  //         ..$body
-  //       }
-  //       new $$anon
-  //     }"""
-  // }
-
   // property("splice list of trees into block") = forAll { (trees: List[Tree]) =>
-  //   q"{ $trees }" == Block(trees.init, trees.last)
+  //   q"{ ..$trees }" == Block(trees.init, trees.last)
   // }
+
+  property("splice list of trees into block with unit") = forAll { (trees: List[Tree]) =>
+    q"{ ..$trees; () }" ≈ Block(trees, q"()")
+  }
 
   // TODO: this test needs to be fixed
-  // property("splice list of trees into block with unit") = forAll { (trees: List[Tree]) =>
-  //   q"{ ..$trees; () }" ≈ Block(trees, q"()")
-  // }
-
   // property("splice valdef into class param") = forAll { (name: TypeName, valdef: ValDef) =>
   //   q"class $name($valdef)" ≈ ellipsis
   // }
@@ -129,6 +140,7 @@ object ConstructionProps extends Properties("construction")
     q"type $name = $t.type" ≈ q"type $name = ${SingletonTypeTree(t)}"
   }
 
+// TODO: this test needs to be fixed
   // property("splice tree into super") = forAll { (T: TypeName, t: Tree) =>
   //   q"$t.super[$T]" ≈ Super(This(t), T)
   // }
@@ -141,10 +153,9 @@ object ConstructionProps extends Properties("construction")
     q"throw $t" ≈ Throw(t)
   }
 
-  // TODO: this test needs to be fixed
-  // property("splice trees into type apply") = forAll { (fun: Tree, types: List[Tree]) =>
-  //   fun.isTerm implies (q"$fun[..$types]" ≈ TypeApply(fun, types))
-  // }
+  property("splice trees into type apply") = forAll { (fun: TreeIsTerm, types: List[Tree]) =>
+    q"$fun[..$types]" ≈ TypeApply(fun, types)
+  }
 
   property("splice type names into type bounds") = forAll { (T1: TypeName, T2: TypeName, T3: TypeName) =>
     q"type $T1 >: $T2 <: $T3" ≈
@@ -160,20 +171,17 @@ object ConstructionProps extends Properties("construction")
         TypeBoundsTree(t1, t2))
   }
 
-  // TODO: this test needs to be fixed
-  // property("splice tparams into typedef (1)") = forAll { (T: TypeName, targs: List[TypeDef], t: Tree) =>
-  //   q"type $T[..$targs] = $t" ≈ TypeDef(Modifiers(), T, targs, t)
-  // }
+  property("splice tparams into typedef (1)") = forAll { (T: TypeName, targs: List[TypeDef], t: Tree) =>
+    q"type $T[..$targs] = $t" ≈ TypeDef(Modifiers(), T, targs, t)
+  }
 
-  // TODO: this test needs to be fixed
-  // property("splice tparams into typedef (2)") = forAll { (T: TypeName, targs1: List[TypeDef], targs2: List[TypeDef], t: Tree) =>
-  //   q"type $T[..$targs1, ..$targs2] = $t" ≈ TypeDef(Modifiers(), T, targs1 ++ targs2, t)
-  // }
+  property("splice tparams into typedef (2)") = forAll { (T: TypeName, targs1: List[TypeDef], targs2: List[TypeDef], t: Tree) =>
+    q"type $T[..$targs1, ..$targs2] = $t" ≈ TypeDef(Modifiers(), T, targs1 ++ targs2, t)
+  }
 
-  // TODO: this test needs to be fixed
-  // property("splice tparams into typedef (3)") = forAll { (T: TypeName, targ: TypeDef, targs: List[TypeDef], t: Tree) =>
-  //   q"type $T[$targ, ..$targs] = $t" ≈ TypeDef(Modifiers(), T, targ :: targs, t)
-  // }
+  property("splice tparams into typedef (3)") = forAll { (T: TypeName, targ: TypeDef, targs: List[TypeDef], t: Tree) =>
+    q"type $T[$targ, ..$targs] = $t" ≈ TypeDef(Modifiers(), T, targ :: targs, t)
+  }
 
   property("splice typename into typedef with default bounds") = forAll { (T1: TypeName, T2: TypeName, t: Tree) =>
     q"type $T1[$T2 >: Any <: Nothing] = $t" ≈
@@ -243,13 +251,12 @@ object ConstructionProps extends Properties("construction")
         CaseDef(Alternative(List(A, B)), EmptyTree, Literal(Constant(())))))
   }
 
-  // TODO: this shouldn't fail
-  // property("splice into applied type tree") = forAll { (T1: TypeName, T2: TypeName, args: List[Tree]) =>
-  //   q"type $T1 = $T2[..$args]" ≈
-  //     TypeDef(
-  //       Modifiers(), T1, List(),
-  //       AppliedTypeTree(Ident(T2), args))
-  // }
+  property("splice into applied type tree") = forAll { (T1: TypeName, T2: TypeName, args: List[Tree]) =>
+    q"type $T1 = $T2[..$args]" ≈
+      TypeDef(
+        Modifiers(), T1, List(),
+        AppliedTypeTree(Ident(T2), args))
+  }
 
   // --- NEGATIVE TESTS TEMPLATES
 
