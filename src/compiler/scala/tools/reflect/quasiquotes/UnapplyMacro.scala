@@ -124,7 +124,9 @@ trait UnapplyMacro { self: Quasiquotes =>
 
     if (settings.Yquasiquotedebug.value) println(s"moduledef\n=${showRaw(moduleDef, printTypes=true, printIds=true)}\n=$moduleDef\n")
 
-    c.introduceTopLevel(nme.QUASIQUOTE_MATCHER_PACKAGE.toString, moduleDef)
+    val modulePos = c.enclosingPosition.focus
+
+    c.introduceTopLevel(nme.QUASIQUOTE_MATCHER_PACKAGE, atPos(modulePos)(moduleDef))
 
     val moduleRef = Select(Ident(nme.QUASIQUOTE_MATCHER_PACKAGE), moduleName)
 
