@@ -24,7 +24,7 @@ trait Reifiers { self: Quasiquotes =>
 
   } with ReflectReifier with Types {
 
-    override def reifyTree(tree: Tree) = atPos(c.enclosingPosition.focus)(reifyBasicTree(tree))
+    override def reifyTree(tree: Tree) = reifyBasicTree(tree)
 
     // Extractor that matches simple identity-like trees which
     // correspond to placeholders within quasiquote.
