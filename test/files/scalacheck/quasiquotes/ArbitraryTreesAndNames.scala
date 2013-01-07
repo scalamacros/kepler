@@ -309,7 +309,7 @@ trait ArbitraryTreesAndNames {
   val maxTreeSize = 5
 
   def arbitrarySized[T](gen: Int => Gen[T]) =
-    Arbitrary(sized(s => gen(s.max(maxTreeSize))))
+    Arbitrary(sized(s => gen(s.min(maxTreeSize))))
 
   implicit val arbLiteral: Arbitrary[Literal] = Arbitrary(genLiteral)
   implicit val arbIdent: Arbitrary[Ident] = Arbitrary(genIdent())
