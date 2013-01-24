@@ -614,6 +614,7 @@ abstract class GenASM extends SubComponent with BytecodeWriters with GenJVMASM {
     def javaArrayType(elem: asm.Type): asm.Type = { asm.Type.getObjectType("[" + elem.getDescriptor) }
 
     def isDeprecated(sym: Symbol): Boolean = { sym.annotations exists (_ matches definitions.DeprecatedAttr) }
+    def isEnum(sym: Symbol): Boolean = sym.superClass == definitions.JavaEnumClass
 
     def addInnerClasses(csym: Symbol, jclass: asm.ClassVisitor) {
       /** The outer name for this inner class. Note that it returns null
@@ -1330,7 +1331,8 @@ abstract class GenASM extends SubComponent with BytecodeWriters with GenJVMASM {
       val thisSignature = getGenericSignature(c.symbol, c.symbol.owner)
       val flags = mkFlags(
         javaFlags(c.symbol),
-        if(isDeprecated(c.symbol)) asm.Opcodes.ACC_DEPRECATED else 0 // ASM pseudo access flag
+        if (isDeprecated(c.symbol)) asm.Opcodes.ACC_DEPRECATED else 0, // ASM pseudo access flag
+        if (isEnum(c.symbol))       asm.Opcodes.ACC_ENUM else 0
       )
       jclass  = createJClass(flags,
                              thisName, thisSignature,
