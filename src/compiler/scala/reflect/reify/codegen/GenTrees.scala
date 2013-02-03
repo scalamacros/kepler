@@ -150,7 +150,15 @@ trait GenTrees {
 
   private def reifyBoundType(tree: Tree): Tree = {
     def reifyBoundType(tree: Tree): Tree = {
-      if (tree.tpe == null)
+      var treeType = tree.tpe;
+      if (treeType == null) {
+        treeType = tree.attachments.get[AppliedTypeTreeOriginalAttachment] match {
+          case Some(AppliedTypeTreeOriginalAttachment(tpe1)) => tpe1
+          case _ => null
+        }
+      }
+      
+      if (treeType == null)
         throw new Error("unexpected: bound type that doesn't have a tpe: " + showRaw(tree))
 
       // if a symbol or a type of the scrutinee are local to reifee
@@ -158,11 +166,11 @@ trait GenTrees {
       // then we can reify the scrutinee as a symless AST and that will definitely be hygienic
       // why? because then typechecking of a scrutinee doesn't depend on the environment external to the quasiquote
       // otherwise we need to reify the corresponding type
-      if (tree.symbol.isLocalToReifee || tree.tpe.isLocalToReifee)
+      if (tree.symbol.isLocalToReifee || treeType.isLocalToReifee)
         reifyProduct(tree)
       else {
         val sym = tree.symbol
-        val tpe = tree.tpe
+        val tpe = treeType
         if (reifyDebug) println("reifying bound type %s (underlying type is %s)".format(sym, tpe))
 
         if (tpe.isSpliceable) {
