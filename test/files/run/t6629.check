@@ -1,0 +1,6 @@
+Expr[Unit]({
+  type X = List[T] forSome { 
+    type T >: Nothing <: Any
+  };
+  ()
+})

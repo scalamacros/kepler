@@ -42,4 +42,8 @@ trait StdAttachments {
    *  (but think thrice before using that API - see the discussion at https://github.com/scala/scala/pull/1639).
    */
   case object SuppressMacroExpansionAttachment
+
+  /** Stores the type of AppiedTypeTree
+  */  
+  case class AppliedTypeTreeOriginalAttachment(tpe: Type)
 }

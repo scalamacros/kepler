@@ -5167,6 +5167,7 @@ trait Typers extends Modes with Adaptations with Tags {
         val tpt = tree.tpt
         val args = tree.args
         val tpt1 = typed1(tpt, mode | FUNmode | TAPPmode, WildcardType)
+        tpt updateAttachment AppliedTypeTreeOriginalAttachment(tpt1.tpe)
         if (tpt1.isErrorTyped) {
           tpt1
         } else if (!tpt1.hasSymbol) {

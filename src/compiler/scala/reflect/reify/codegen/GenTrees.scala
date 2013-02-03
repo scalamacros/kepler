@@ -166,7 +166,12 @@ trait GenTrees {
   private def reifyBoundType(tree: Tree): Tree = {
     val sym = tree.symbol
     val tpe = tree.tpe
-
+    if (tpe == null) {
+       tpe = tree.attachments.get[AppliedTypeTreeOriginalAttachment] match {
+         case Some(AppliedTypeTreeOriginalAttachment(tpe1)) => tpe1
+         case _ => null
+      }
+    }
     def reifyBoundType(tree: Tree): Tree = {
       assert(tpe != null, "unexpected: bound type that doesn't have a tpe: " + showRaw(tree))
 
