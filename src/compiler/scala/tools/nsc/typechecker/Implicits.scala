@@ -149,7 +149,7 @@ trait Implicits {
   class SearchResult(val tree: Tree, val subst: TreeTypeSubstituter) {
     override def toString = "SearchResult(%s, %s)".format(tree,
       if (subst.isEmpty) "" else subst)
-    
+
     def isFailure          = false
     def isAmbiguousFailure = false
     final def isSuccess    = !isFailure
@@ -158,7 +158,7 @@ trait Implicits {
   lazy val SearchFailure = new SearchResult(EmptyTree, EmptyTreeTypeSubstituter) {
     override def isFailure = true
   }
-  
+
   lazy val AmbiguousSearchFailure = new SearchResult(EmptyTree, EmptyTreeTypeSubstituter) {
     override def isFailure          = true
     override def isAmbiguousFailure = true
@@ -218,6 +218,10 @@ trait Implicits {
     override def hashCode = name.## + pre.## + sym.##
     override def toString = name + ": " + tpe
   }
+
+  /** A class which is used to track pending implicits to prevent infinite implicit searches.
+   */
+  case class OpenImplicit(info: ImplicitInfo, pt: Type, tree: Tree)
 
   /** A sentinel indicating no implicit was found */
   val NoImplicitInfo = new ImplicitInfo(null, NoType, NoSymbol) {
@@ -402,13 +406,25 @@ trait Implicits {
      *  @pre           `info.tpe` does not contain an error
      */
     private def typedImplicit(info: ImplicitInfo, ptChecked: Boolean, isLocal: Boolean): SearchResult = {
-      (context.openImplicits find { case (tp, tree1) => tree1.symbol == tree.symbol && dominates(pt, tp)}) match {
+      // SI-7167 let implicit macros decide what amounts for a divergent implicit search
+      // imagine a macro writer which wants to synthesize a complex implicit Complex[T] by making recursive calls to Complex[U] for its parts
+      // e.g. we have `class Foo(val bar: Bar)` and `class Bar(val x: Int)`
+      // then it's quite reasonable for the macro writer to synthesize Complex[Foo] by calling `inferImplicitValue(typeOf[Complex[Bar])`
+      // however if we didn't insert the `info.sym.isMacro` check here, then under some circumstances
+      // (e.g. as described here http://groups.google.com/group/scala-internals/browse_thread/thread/545462b377b0ac0a)
+      // `dominates` might decide that `Bar` dominates `Foo` and therefore a recursive implicit search should be prohibited
+      // now when we yield control of divergent expansions to the macro writer, what happens next?
+      // in the worst case, if the macro writer is careless, we'll get a StackOverflowException from repeated macro calls
+      // otherwise, the macro writer could check `c.openMacros` and `c.openImplicits` and do `c.abort` when expansions are deemed to be divergent
+      // upon receiving `c.abort` the typechecker will decide that the corresponding implicit search has failed
+      // which will fail the entire stack of implicit searches, producing a nice error message provided by the programmer
+      (context.openImplicits find { case OpenImplicit(info, tp, tree1) => !info.sym.isMacro && tree1.symbol == tree.symbol && dominates(pt, tp)}) match {
          case Some(pending) =>
            //println("Pending implicit "+pending+" dominates "+pt+"/"+undetParams) //@MDEBUG
            throw DivergentImplicit
          case None =>
            try {
-             context.openImplicits = (pt, tree) :: context.openImplicits
+             context.openImplicits = OpenImplicit(info, pt, tree) :: context.openImplicits
              // println("  "*context.openImplicits.length+"typed implicit "+info+" for "+pt) //@MDEBUG
              typedImplicit0(info, ptChecked, isLocal)
            } catch {
