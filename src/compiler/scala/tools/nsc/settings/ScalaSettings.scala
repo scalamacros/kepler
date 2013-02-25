@@ -180,6 +180,7 @@ trait ScalaSettings extends AbsScalaSettings
   val Yidedebug               = BooleanSetting("-Yide-debug", "Generate, validate and output trees using the interactive compiler.")
   val Yinferdebug             = BooleanSetting("-Yinfer-debug", "Trace type inference and implicit search.")
   val Yissuedebug             = BooleanSetting("-Yissue-debug", "Print stack traces when a context issues an error.")
+  val YmacrodebugExpand       = BooleanSetting("-Ymacro-debug-expand", "Trace essential macro-expansion-related activities.")
   val YmacrodebugLite         = BooleanSetting("-Ymacro-debug-lite", "Trace essential macro-related activities.")
   val YmacrodebugVerbose      = BooleanSetting("-Ymacro-debug-verbose", "Trace all macro-related activities: compilation, generation of synthetics, classloading, expansion, exceptions.")
   val Ypmatdebug              = BooleanSetting("-Ypmat-debug", "Trace all pattern matcher activity.")

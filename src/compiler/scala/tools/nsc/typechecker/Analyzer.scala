@@ -91,11 +91,13 @@ trait Analyzer extends AnyRef
           applyPhase(unit)
           undoLog.clear()
         }
+        currentRun.units.foreach { _.preTypedBody = EmptyTree }
         if (Statistics.canEnable) Statistics.stopTimer(typerNanos, start)
       }
       def apply(unit: CompilationUnit) {
         try {
           val typer = newTyper(rootContext(unit))
+          unit.preTypedBody = unit.body
           unit.body = typer.typed(unit.body)
           if (global.settings.Yrangepos.value && !global.reporter.hasErrors) global.validatePositions(unit.body)
           for (workItem <- unit.toCheck) workItem()

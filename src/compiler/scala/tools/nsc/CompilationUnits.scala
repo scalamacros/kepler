@@ -33,6 +33,7 @@ trait CompilationUnits { self: Global =>
 
     /** the content of the compilation unit in tree form */
     var body: Tree = EmptyTree
+    var preTypedBody: Tree = EmptyTree
 
     def exists = source != NoSourceFile && source != null
 

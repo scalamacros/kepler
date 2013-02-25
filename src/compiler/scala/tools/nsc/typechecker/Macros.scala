@@ -295,7 +295,7 @@ trait Macros extends scala.tools.reflect.FastTrack with Traces with Helpers {
           case notFound if notFound.tree.isEmpty =>
             fail()
           case found =>
-            val macroImplRef = typer.typed(Apply(Select(found.tree, nme.resolveMacroImpl), List(macroDdef)))
+            val macroImplRef = typer.context.withMacrosEnabled(typer.typed(Apply(Select(found.tree, nme.resolveMacroImpl), List(macroDdef))))
             if (macroImplRef.isErroneous) fail() else success(macroImplRef)
         }
       }
@@ -343,8 +343,8 @@ trait Macros extends scala.tools.reflect.FastTrack with Traces with Helpers {
    *          `null` otherwise.
    */
   type MacroRuntime = MacroArgs => Any
-  private val macroRuntimesCache = perRunCaches.newWeakMap[Symbol, MutableMap[MacroRuntimeFlavor, MacroRuntime]]
-  def macroRuntime(macroDef: Symbol, flavor: MacroRuntimeFlavor): MacroRuntime = {
+  private val macroRuntimesCache = perRunCaches.newWeakMap[Symbol, MutableMap[MacroRuntimeFlavor, MacroRuntime]]  
+  def macroRuntime(context:Context,macroDef: Symbol, flavor: MacroRuntimeFlavor): MacroRuntime = {
     macroTraceVerbose(s"looking for ${flavorNames(flavor)} macro runtime: ")(macroDef)
     if (fastTrack contains macroDef) {
       if (flavor == FLAVOR_EXPAND) {
@@ -365,18 +365,34 @@ trait Macros extends scala.tools.reflect.FastTrack with Traces with Helpers {
           else if (flavor == FLAVOR_ONINFER) "onInfer"
           else abort(s"${flavorNames(flavor)} $macroDef")
         macroLogVerbose(s"resolved implementation as $className.$methName")
+      
+        val jitCompiler = new {
+          val analyzer: Macros.this.type = Macros.this
+        } with JitCompiler
 
         try {
+          val (classLoader:ClassLoader,modulePath:String) = jitCompiler.tryLocalExpansion(className,methName,context,macroDef) match {
+            case JitSuccess() =>
+              val mp = className
+              macroTraceVerbose("successfull local expansion clazz: ")(mp)
+              (jitCompiler.jitClassLoader,mp)
+            case JitSkip() =>
+              macroTraceVerbose("loading external implementation class: ")(className)
+              (macroClassloader,className)
+            case JitError() =>
+              macroLogVerbose("local expansion error: ")
+              macroDef setFlag IS_ERROR
+              throw JitCompilerException("")
+          }
           // JAVA REFLECTION
           // TODO: get rid of this when the Scala reflection-based version is fixed
           // ==========
-          macroTraceVerbose("loading implementation class: ")(className)
-          macroTraceVerbose("classloader is: ")(ReflectionUtils.show(macroClassloader))
-          val implClass = Class.forName(className, true, macroClassloader)
+          macroTraceVerbose("classloader is: ")(ReflectionUtils.show(classLoader))
+          val implClass = Class.forName(modulePath, true, classLoader)
           val implMeths = implClass.getDeclaredMethods.find(_.getName == methName)
           // relies on the fact that macro impls cannot be overloaded
           // so every methName can resolve to at maximum one method
-          val implMeth = implMeths getOrElse { throw new NoSuchMethodException(s"$className.$methName") }
+          val implMeth = implMeths getOrElse { throw new NoSuchMethodException(s"$modulePath.$methName") }
           macroLogVerbose("successfully loaded macro impl as (%s, %s)".format(implClass, implMeth))
           args => {
             val implObj =
@@ -406,7 +422,13 @@ trait Macros extends scala.tools.reflect.FastTrack with Traces with Helpers {
           //   implMeth(implArgs: _*)
           // }
         } catch {
+          case ex:JitCompilerCycleFoundException =>
+            macroTraceVerbose(s"macro runtime failed to load: ")(ex.toString)
+            macroDef setFlag IS_ERROR
+            null
           case ex: Exception =>
+            // TODO: Remove Stack trace from here
+            //ex.printStackTrace()
             macroTraceVerbose(s"macro runtime failed to load: ")(ex.toString)
             if (flavor == FLAVOR_EXPAND) macroDef setFlag IS_ERROR
             null
@@ -908,9 +930,13 @@ trait Macros extends scala.tools.reflect.FastTrack with Traces with Helpers {
         Cancel(typer.infer.setError(expandee))
       }
       else try {
-        val runtime = macroRuntime(expandee.symbol, FLAVOR_EXPAND)
-        if (runtime != null) macroExpandWithRuntime(typer, expandee, runtime)
-        else macroExpandWithoutRuntime(typer, expandee)
+        if ( typer.context.macrosEnabled ) {
+          val runtime = macroRuntime(typer.context,expandee.symbol,FLAVOR_EXPAND)
+          if (runtime != null) macroExpandWithRuntime(typer, expandee, runtime)
+          else macroExpandWithoutRuntime(typer, expandee)
+        } else {
+          Delay(expandee)
+        }
       } catch {
         case typer.TyperErrorGen.MacroExpansionException => Failure(expandee)
       }
