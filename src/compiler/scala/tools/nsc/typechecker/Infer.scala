@@ -1144,7 +1144,7 @@ trait Infer extends Checkable {
     def inferExprInstance(tree: Tree, tparams: List[Symbol], pt: Type = WildcardType, treeTp0: Type = null, keepNothings: Boolean = true, useWeaklyCompatible: Boolean = false, allowMacroHelpers: Boolean = true): List[Symbol] = {
       val treeTp = if(treeTp0 eq null) tree.tpe else treeTp0 // can't refer to tree in default for treeTp0
       if (allowMacroHelpers && treeInfo.isMacroApplication(tree)) {
-        val runtime = macroRuntime(tree.symbol, FLAVOR_ONINFER)
+        val runtime = macroRuntime(context,tree.symbol, FLAVOR_ONINFER)
         if (runtime != null) {
           val c = macroContext(newTyper(context), EmptyTree, tree)
           val tic = new c.InferExprInstanceContext(tree, tparams, pt, treeTp, keepNothings, useWeaklyCompatible)
@@ -1219,7 +1219,7 @@ trait Infer extends Checkable {
         try {
           val tree = Apply(fn, args)
           if (allowMacroHelpers && treeInfo.isMacroApplication(tree)) {
-            val runtime = macroRuntime(tree.symbol, FLAVOR_ONINFER)
+            val runtime = macroRuntime(context,tree.symbol, FLAVOR_ONINFER)
             if (runtime != null) {
               val c = macroContext(newTyper(context), EmptyTree, tree)
               val tic = new c.InferMethodInstanceContext(tree, undetparams, pt0)

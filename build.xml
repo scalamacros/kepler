@@ -2457,7 +2457,25 @@ BOOTRAPING TEST AND TEST SUITE
       <!-- <scripttests dir="${partest.dir}/${partest.srcdir}/script" includes="*.scala"/> -->
     </partest>
   </target>
-
+  <target name="test.macroexpand.suite" depends="pack.done">
+    <property name="partest.srcdir" value="files" />
+    <partest showlog="yes" erroronfailed="yes" javacmd="${java.home}/bin/java"
+             timeout="2400000"
+             srcdir="${partest.srcdir}"
+             scalacopts="${scalac.args.optimise} -language:experimental.macros ">
+      <!-- -Ymacro-debug-expand -Ymacro-debug-verbose
+      <compilerarg value="-Xpluginsdir"/>
+      <compilerarg file="${build-quick.dir}/misc/scala-devel/plugins"/>
+      -->
+      <compilationpath>
+        <path refid="pack.classpath"/>
+        <fileset dir="${partest.dir}/files/lib" includes="*.jar" />
+      </compilationpath>
+      
+      <negtests  dir="${partest.dir}/${partest.srcdir}/macroexpand-neg" includes="*.scala"/>
+      <runtests  dir="${partest.dir}/${partest.srcdir}/macroexpand-run" includes="*.scala"/>
+    </partest>
+  </target>
   <target name="test.continuations.suite" depends="pack.done">
     <property name="partest.srcdir" value="files" />
     <partest showlog="yes" erroronfailed="yes" javacmd="${java.home}/bin/java"
