@@ -16,7 +16,7 @@ trait Parsers { self: Quasiquotes =>
   } with ScalaParser {
 
     def wrapCode(code: String): String =
-      "object wrapper {" + EOL + code + EOL + "}"
+      s"object wrapper { $$wrapper$$self => $EOL $code $EOL }"
 
     def unwrapTree(wrappedTree: Tree): Tree = {
       val PackageDef(_, List(ModuleDef(_, _, Template(_, _, _ :: parsed)))) = wrappedTree

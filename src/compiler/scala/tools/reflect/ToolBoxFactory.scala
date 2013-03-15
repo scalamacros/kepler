@@ -279,7 +279,7 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
       def parse(code: String): Tree = {
         val run = new Run
         reporter.reset()
-        val wrappedCode = "object wrapper {" + EOL + code + EOL + "}"
+        val wrappedCode = s"object wrapper { $$wrapper$$self => $EOL $code $EOL }"
         val file = new BatchSourceFile("<toolbox>", wrappedCode)
         val unit = new CompilationUnit(file)
         phase = run.parserPhase
