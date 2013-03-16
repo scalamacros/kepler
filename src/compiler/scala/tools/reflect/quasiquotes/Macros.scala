@@ -18,14 +18,25 @@ trait Macros { self: Quasiquotes =>
 
     val parser: Parser
 
-    /** Extracts universe tree, args trees and params strings from macroApplication. */
-    def extract: (Tree, List[Tree], List[String])
-
     /** Reifier factory that abstracts over different reifiers need for apply and unapply macros. */
     def reifier(universe: Tree, placeholders: Placeholders): Reifier
 
     /** Wraps reified tree into a final result of macro expansion. */
     def wrap(universe: Tree, placeholders: Placeholders, reified: Tree): Tree
+
+    /** Extracts universe tree, args trees and params strings from macroApplication. */
+    def extract = c.macroApplication match {
+      case q"$universe.Quasiquote($stringContext.apply(..$parts0)).${_}.${_}(..$args)" =>
+        val parts = parts0.map {
+          case Literal(Constant(s: String)) => s
+          case part => c.abort(part.pos, "Quasiquotes can only be used with constant string arguments.")
+        }
+        if (args.length != parts.length - 1)
+          c.abort(c.enclosingPosition, "Imbalanced amount of arguments.")
+        (universe, args, parts)
+      case _ =>
+        c.abort(c.macroApplication.pos, s"Couldn't parse call prefix tree ${c.macroApplication}.")
+    }
 
     /** Generates scala code to be parsed by parser and placeholders map from incoming args and parts. */
     def generate(args: List[Tree], parts: List[String]): (String, Placeholders) = {
@@ -73,19 +84,6 @@ trait Macros { self: Quasiquotes =>
     def reifier(universe: Tree, placeholders: Placeholders): Reifier =
       new ApplyReifier(universe, placeholders)
 
-    def extract = c.macroApplication match {
-      case q"$universe.Quasiquote($stringContext.apply(..$parts0)).${_}.apply(..$args)" =>
-        val parts = parts0.map {
-          case Literal(Constant(s: String)) => s
-          case part => c.abort(part.pos, "Quasiquotes can only be used with constant string arguments.")
-        }
-        if (args.length != parts.length - 1)
-          c.abort(c.enclosingPosition, "Imbalanced amount of arguments.")
-        (universe, args, parts)
-      case _ =>
-        c.abort(c.macroApplication.pos, s"Couldn't parse call prefix tree ${c.macroApplication}.")
-    }
-
     def wrap(universe: Tree, placeholders: Placeholders, reified: Tree): Tree =
       q"""{
         val $u: $universe.type = $universe
@@ -98,63 +96,7 @@ trait Macros { self: Quasiquotes =>
     def reifier(universe: Tree, placeholders: Placeholders): Reifier =
       new UnapplyReifier(universe, placeholders)
 
-    def extract = c.macroApplication match {
-      case q"$universe.Quasiquote($stringContext.apply(..$parts0)).${_}.unapply(${_})" =>
-        val parts = parts0.map{
-          case Literal(Constant(s: String)) => s
-          case part => c.abort(part.pos, "Quasiquotes can only be used with constant string arguments.")
-        }
-        if (!(parts.length >= 1 && parts.length <= 23))
-          c.abort(c.enclosingPosition, "Inappropriate amount of quasiquote params.")
-        // args are currently not exposed in macroApplication
-        val args = List.fill(parts.length - 1)(EmptyTree)
-        (universe, args, parts)
-      case _ =>
-        c.abort(c.macroApplication.pos, s"Couldn't parse call prefix tree ${c.macroApplication}.")
-    }
-
-    def wrap(universe: Tree, placeholders: Placeholders, reified: Tree) = {
-
-      val unapplyBody =
-        if (reified.isInstanceOf[Bind])
-          q"Some(tree)"
-        else if (placeholders.isEmpty)
-          q"$reified.equalsStructure(tree)"
-        else {
-          val matchResult =
-            if (placeholders.size == 1)
-              q"Some(${TermName(placeholders.keys.head)})"
-            else {
-              val tupleN = TermName("Tuple" + placeholders.size.toString)
-              val tupleArgs = placeholders.map(p => Ident(TermName(p._1)))
-              q"Some($tupleN(..$tupleArgs))"
-            }
-          q"""{
-            // importing type tags from universe for tree pattern matching to work as expected
-            import $u._
-            tree match {
-              case $reified => $matchResult
-              case _ => None
-            }
-          }"""
-        }
-
-      val moduleName = TermName(nme.QUASIQUOTE_MATCHER_NAME + randomUUID().toString.replace("-", ""))
-      val modulePos = c.enclosingPosition.focus
-      val moduleDef =
-        q"""object $moduleName {
-          def unapply($u: scala.reflect.api.Universe)(tree: $u.Tree) = $unapplyBody
-        }"""
-
-      debug(s"moduledef\n=${showRaw(moduleDef, printTypes=true, printIds=true)}\n=$moduleDef\n")
-
-      val qual = c.introduceTopLevel(nme.QUASIQUOTE_MATCHER_PACKAGE, atPos(modulePos)(moduleDef))
-
-      val unapplySelector = Ident(nme.SELECTOR_DUMMY)
-      unapplySelector.setType(memberType(universe.tpe, tpnme.Tree))
-
-      q"$qual.unapply($universe)($unapplySelector)"
-    }
+    def wrap(universe: Tree, placeholders: Placeholders, reified: Tree) = reified
   }
 
   trait TermParsing { val parser = TermParser }

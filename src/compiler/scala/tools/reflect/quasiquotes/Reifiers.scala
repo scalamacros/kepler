@@ -155,7 +155,7 @@ trait Reifiers { self: Quasiquotes =>
       case global.pendingSuperCall =>
         mirrorBuildCall("PendingSuperCallLike")
       case Placeholder(name) =>
-        Bind(TermName(name), Ident(nme.WILDCARD))
+        placeholders(name.toString)._1
       case Applied(fun, targs, argss) if fun != tree =>
         if (targs.length > 0)
           mirrorBuildCall("Applied", reify(fun), reifyList(targs), reifyList(argss))
@@ -172,7 +172,7 @@ trait Reifiers { self: Quasiquotes =>
       if (!placeholders.contains(name.toString))
         super.reifyName(name)
       else {
-        Bind(TermName(name.toString), Ident(nme.WILDCARD))
+        placeholders(name.toString)._1
       }
 
     override def reifyModifiers(m: global.Modifiers) =
@@ -182,12 +182,12 @@ trait Reifiers { self: Quasiquotes =>
       val last = if (xs.length > 0) xs.last else EmptyTree
       last match {
         case Placeholder(name) if placeholders(name)._2 == 1 =>
-          val bnd = Bind(TermName(name), Ident(nme.WILDCARD))
+          val bnd = placeholders(name.toString)._1
           xs.init.foldRight[Tree](bnd) { (el, rest) =>
             scalaFactoryCall("collection.immutable.$colon$colon", reify(el), rest)
           }
         case List(Placeholder(name)) if placeholders(name)._2 == 2 =>
-          val bnd = Bind(TermName(name), Ident(nme.WILDCARD))
+          val bnd = placeholders(name.toString)._1
           xs.init.foldRight[Tree](bnd) { (el, rest) =>
             scalaFactoryCall("collection.immutable.$colon$colon", reify(el), rest)
           }
@@ -195,6 +195,15 @@ trait Reifiers { self: Quasiquotes =>
           super.reifyList(xs)
       }
     }
+
+    override def mirrorSelect(name: String): Tree =
+      Select(universe, TermName(name))
+
+    override def mirrorCall(name: TermName, args: Tree*): Tree =
+      Apply(Select(universe, name), args.toList)
+
+    override def mirrorBuildCall(name: TermName, args: Tree*): Tree =
+      Apply(Select(Select(universe, nme.build), name), args.toList)
   }
 
   trait Types {

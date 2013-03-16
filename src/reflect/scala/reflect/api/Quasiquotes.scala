@@ -8,11 +8,11 @@ trait Quasiquotes { self: Universe =>
   implicit class Quasiquote(ctx: StringContext) {
     object q {
       def apply(args: Any*): Any = macro ???
-      def unapply(tree: Any): Option[Any] = macro ???
+      def unapply(subpatterns: _*): Option[Any] = macro ???
     }
     object tq {
       def apply(args: Any*): Any = macro ???
-      def unapply(tree: Any): Option[Any] = macro ???
+      def unapply(subpatterns: _*): Option[Any] = macro ???
     }
   }
 }
