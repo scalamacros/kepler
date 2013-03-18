@@ -9,10 +9,15 @@ import scala.collection.immutable.ListMap
 trait Macros { self: Quasiquotes =>
   import c.universe._
 
+  /** This is a shorcut variable that links to "$u" universe variable name.
+   *  With the help of it it's possible to use $u inside of the quasiquote
+   *  and it will have the same meaning in expanded code.
+   */
   val u = nme.UNIVERSE_SHORT
 
   /** This trait abstracts over all variations of quasiquotes
-   *  and allows to share core logic between apply and unapply macros.
+   *  and allows to share core logic. The main differences are
+   *  in parser, reifier and wrapping behaviour.
    */
   trait AbstractMacro {
 
@@ -22,7 +27,7 @@ trait Macros { self: Quasiquotes =>
     def reifier(universe: Tree, placeholders: Placeholders): Reifier
 
     /** Wraps reified tree into a final result of macro expansion. */
-    def wrap(universe: Tree, placeholders: Placeholders, reified: Tree): Tree
+    def wrap(universe: Tree, reified: Tree): Tree
 
     /** Extracts universe tree, args trees and params strings from macroApplication. */
     def extract = c.macroApplication match {
@@ -73,18 +78,16 @@ trait Macros { self: Quasiquotes =>
       debug(s"parsed tree\n=${tree}\n=${showRaw(tree)}\n")
       val reified = reifier(universe, placeholders).reify(tree)
       debug(s"reified tree\n=${reified}\n=${showRaw(reified)}\n")
-      val result = wrap(universe, placeholders, reified)
+      val result = wrap(universe, reified)
       debug(s"result tree\n=${result}\n=${showRaw(result)}\n")
       result
     }
   }
 
   trait ApplyMacro extends AbstractMacro {
-
     def reifier(universe: Tree, placeholders: Placeholders): Reifier =
       new ApplyReifier(universe, placeholders)
-
-    def wrap(universe: Tree, placeholders: Placeholders, reified: Tree): Tree =
+    def wrap(universe: Tree, reified: Tree): Tree =
       q"""{
         val $u: $universe.type = $universe
         $reified
@@ -92,11 +95,9 @@ trait Macros { self: Quasiquotes =>
   }
 
   trait UnapplyMacro extends AbstractMacro {
-
     def reifier(universe: Tree, placeholders: Placeholders): Reifier =
       new UnapplyReifier(universe, placeholders)
-
-    def wrap(universe: Tree, placeholders: Placeholders, reified: Tree) = reified
+    def wrap(universe: Tree, reified: Tree) = reified
   }
 
   trait TermParsing { val parser = TermParser }

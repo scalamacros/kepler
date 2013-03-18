@@ -51,6 +51,12 @@ trait BuildUtils { self: SymbolTable =>
 
     def Ident(sym: Symbol): Ident = self.Ident(sym)
 
+    def Block(stats: List[Tree]): Block = stats match {
+      case Nil => self.Block(Nil, Literal(Constant(())))
+      case elem :: Nil => self.Block(Nil, elem)
+      case elems => self.Block(elems.init, elems.last)
+    }
+
     def TypeTree(tp: Type): TypeTree = self.TypeTree(tp)
 
     def thisPrefix(sym: Symbol): Type = sym.thisPrefix

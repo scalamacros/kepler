@@ -3,13 +3,19 @@ import Prop._
 import Gen._
 import Arbitrary._
 
-import scala.reflect.runtime.universe._
-import Flag._
+import scala.reflect.runtime.universe.Tree
 
 class QuasiquoteProperties(name: String) extends Properties(name) with ArbitraryTreesAndNames {
 
-  def test(name: String)(block: => Boolean): Unit =
-    property(name) = exists { (u: Unit) => block }
+  /** Runs a code block and returns proof confirmation
+   *  if no exception has been thrown while executing code
+   *  block. This is useful for simple one-off tests.
+   */
+  def test[T](block: => T)=
+    Prop { (params) =>
+      block
+      Result(Prop.Proof)
+    }
 
   implicit class TestSimilarTree(tree1: Tree) {
     def ≈(tree2: Tree) = tree1.equalsStructure(tree2)
@@ -23,3 +29,4 @@ class QuasiquoteProperties(name: String) extends Properties(name) with Arbitrary
     def ≈(other: List[List[Tree]]) = (lst.length == other.length) && lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
   }
 }
+

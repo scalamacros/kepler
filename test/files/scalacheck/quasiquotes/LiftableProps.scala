@@ -8,65 +8,72 @@ import Flag._
 
 object LiftableProps extends QuasiquoteProperties("liftable") {
 
-  // this tests use exists as there is no neeed
-  // to test the same property for many possible values
-
-  property("splice byte") = exists { (c: Byte) =>
+  property("splice byte") = test {
+    val c: Byte = 0
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice short") = exists { (c: Short) =>
+  property("splice short") = test {
+    val c: Short = 0
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice char") = exists { (c: Char) =>
+  property("splice char") = test {
+    val c: Char = 'c'
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice int") = exists { (c: Int) =>
+  property("splice int") = test {
+    val c: Int = 0
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice long") = exists { (c: Long) =>
+  property("splice long") = test {
+    val c: Long = 0
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice float") = exists { (c: Float) =>
+  property("splice float") = test {
+    val c: Float = 0.0f
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice double") = exists { (c: Double) =>
+  property("splice double") = test {
+    val c: Double = 0.0
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice boolean") = exists { (c: Boolean) =>
+  property("splice boolean") = test {
+    val c: Boolean = false
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice string") = exists { (c: String) =>
+  property("splice string") = test {
+    val c: String = "s"
     q"$c" ≈ Literal(Constant(c))
   }
 
-  property("splice unit") = exists { (c: Unit) =>
+  property("splice unit") = test {
+    val c: Unit = ()
     q"$c" ≈ Literal(Constant(c))
   }
 
-  test("lift symbol") {
+  property("lift symbol") = test {
     val s = rootMirror.staticClass("scala.Int")
     q"$s" ≈ Ident(s)
   }
 
-  test("lift type") {
+  property("lift type") = test {
     val tpe = rootMirror.staticClass("scala.Int").toType
     q"$tpe" ≈ TypeTree(tpe)
   }
 
-  test("lift type tag") {
+  property("lift type tag") = test {
     val tag = TypeTag.Int
     q"$tag" ≈ TypeTree(tag.tpe)
   }
 
-  test("lift weak type tag") {
+  property("lift weak type tag") = test {
     val tag = WeakTypeTag.Int
     q"$tag" ≈ TypeTree(tag.tpe)
   }

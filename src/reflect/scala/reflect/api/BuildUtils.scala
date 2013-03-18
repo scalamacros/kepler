@@ -65,6 +65,8 @@ private[reflect] trait BuildUtils { self: Universe =>
 
     def Ident(sym: Symbol): Ident
 
+    def Block(stats: List[Tree]): Block
+
     def TypeTree(tp: Type): TypeTree
 
     def thisPrefix(sym: Symbol): Type

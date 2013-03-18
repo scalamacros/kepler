@@ -28,12 +28,6 @@ object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction
     y1 ≈ x1 && y2 ≈ x2 && ys ≈ List(x3)
   }
 
-  // TODO: this test needs to be fixed (this should fail due to incorrect usage of "..")
-  // property("f(..xs, ..ys)") = forAll { (x1: Tree, x2: Tree, x3: Tree) =>
-  //   val q"f(..$xs, ..$ys)" = q"f($x1, $x2, $x3)"
-  //   false
-  // }
-
   property ("f(...xss)") = forAll { (x1: Tree, x2: Tree) =>
     val q"f(...$argss)" = q"f($x1)($x2)"
     argss ≈ List(List(x1), List(x2))

@@ -120,28 +120,10 @@ object TermConstructionProps extends QuasiquoteProperties("term construction") {
       }"""
   }
 
-  // TODO: this test needs to be fixed
-  // property("splice list of trees into block") = forAll { (trees: List[Tree]) =>
-  //   q"{ ..$trees }" == Block(trees.init, trees.last)
-  // }
-
-  property("splice list of trees into block with unit") = forAll { (trees: List[Tree]) =>
-    q"{ ..$trees; () }" ≈ Block(trees, q"()")
-  }
-
-  // TODO: this test needs to be fixed
-  // property("splice valdef into class param") = forAll { (name: TypeName, valdef: ValDef) =>
-  //   q"class $name($valdef)" ≈ ellipsis
-  // }
 
   property("splice tree into singleton type tree") = forAll { (name: TypeName, t: Tree) =>
     q"type $name = $t.type" ≈ q"type $name = ${SingletonTypeTree(t)}"
   }
-
-  // TODO: this test needs to be fixed
-  // property("splice tree into super") = forAll { (T: TypeName, t: Tree) =>
-  //   q"$t.super[$T]" ≈ Super(This(t), T)
-  // }
 
   property("splice type name into this") = forAll { (T: TypeName) =>
     q"$T.this" ≈ This(T)
@@ -193,11 +175,6 @@ object TermConstructionProps extends QuasiquoteProperties("term construction") {
             Ident(TypeName("Nothing"))))),
         t)
   }
-
-  // TODO: this test needs to be fixed
-  // property("splice targs into classdef") = forAll { (C: TypeName, targs: List[TypeDef], t: Tree) =>
-  //   q"class $C[..$targs]" ≈ ...
-  // }
 
   property("splice type names into compound type tree") = forAll { (T: TypeName, A: TypeName, B: TypeName) =>
     q"type $T = $A with $B" ≈
@@ -255,13 +232,36 @@ object TermConstructionProps extends QuasiquoteProperties("term construction") {
         AppliedTypeTree(Ident(T2), args))
   }
 
-  // --- NEGATIVE TESTS TEMPLATES
+  property("splice list of trees into block (1)") = forAll { (trees: List[Tree]) =>
+    q"{ ..$trees }" ≈ (trees match {
+      case Nil => Block(Nil, q"()")
+      case _   => Block(trees.init, trees.last)
+    })
+  }
 
-  // // not allowed, T2 should be a name
-  // property("splice typename into typedef with default bounds") = forAll { (T1: TypeName, T2: TypeDef, t: Tree) =>
-  //   q"type $T1[$T2 >: _root_.scala.Any <: _root_.scala.Nothing] = $t" ≈
-  //     TypeDef(Modifiers(), T1, List(T2), t)
+  property("splice list of trees into block (2)") = forAll { (trees1: List[Tree], trees2: List[Tree]) =>
+    q"{ ..$trees1 ; ..$trees2 }" ≈ ((trees1 ++ trees2) match {
+      case Nil   => Block(Nil, Literal(Constant(())))
+      case trees => Block(trees.init, trees.last)
+    })
+  }
+
+  property("splice list of trees into block (3)") = forAll { (trees: List[Tree], tree: Tree) =>
+    q"{ ..$trees; $tree }" ≈ Block(trees, tree)
+  }
+
+  // TODO: this test needs to be implemented
+  // property("splice valdef into class param") = forAll { (name: TypeName, valdef: ValDef) =>
+  //   q"class $name($valdef)" ≈ ...
   // }
 
-}
+  // TODO: this test needs to be implemented
+  // property("splice tree into super") = forAll { (T: TypeName, t: Tree) =>
+  //   q"$t.super[$T]" ≈ ...
+  // }
 
+  // TODO: this test needs to be implemented
+  // property("splice targs into classdef") = forAll { (C: TypeName, targs: List[TypeDef], t: Tree) =>
+  //   q"class $C[..$targs]" ≈ ...
+  // }
+}

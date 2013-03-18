@@ -120,6 +120,8 @@ trait Reifiers { self: Quasiquotes =>
       case Apply(f, List(Placeholder(CorrespondsTo(argss, tpe)))) if tpe <:< iterableIterableTreeType =>
         val f1 = reifyTree(f)
         q"$argss.foldLeft[$u.Tree]($f1) { $u.Apply(_, _) }"
+      case Block(stats, p @ Placeholder(CorrespondsTo(tree, tpe))) =>
+        mirrorBuildCall("Block", reifyList(stats :+ p))
       case Placeholder(name) if placeholders(name)._2 > 0 =>
         val (tree, card) = placeholders(name)
         c.abort(tree.pos, s"Can't splice tree with '${fmtCard(card)}' cardinality in this position.")
@@ -155,7 +157,10 @@ trait Reifiers { self: Quasiquotes =>
       case global.pendingSuperCall =>
         mirrorBuildCall("PendingSuperCallLike")
       case Placeholder(name) =>
-        placeholders(name.toString)._1
+        val (tree, card) = placeholders(name.toString)
+        if (card > 0)
+          c.abort(tree.pos, s"Can't extract a part of the tree with '${fmtCard(card)}' cardinality in this position.")
+        tree
       case Applied(fun, targs, argss) if fun != tree =>
         if (targs.length > 0)
           mirrorBuildCall("Applied", reify(fun), reifyList(targs), reifyList(argss))

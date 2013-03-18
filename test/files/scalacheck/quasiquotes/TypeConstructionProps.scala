@@ -8,7 +8,7 @@ import Flag._
 
 object TypeConstructionProps extends QuasiquoteProperties("type construction")  {
 
-  property("bare idents contain type names") = exists { (u: Unit) =>
+  property("bare idents contain type names") = test {
     tq"x" ≈ Ident(TypeName("x"))
   }
 
