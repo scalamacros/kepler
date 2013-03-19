@@ -1921,6 +1921,7 @@ BOOTSTRAPPING BUILD (STRAP)
       <include name="**/*.scala"/>
       <compilationpath>
         <pathelement location="${build-strap.dir}/classes/library"/>
+        <pathelement location="${build-strap.dir}/classes/reflect"/>
       </compilationpath>
     </scalacfork>
   </target>
