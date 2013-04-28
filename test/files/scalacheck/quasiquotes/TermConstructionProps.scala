@@ -6,8 +6,7 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object TermConstructionProps extends QuasiquoteProperties("term construction")
-                                with AnnotationConstructionProps {
+object TermConstructionProps extends QuasiquoteProperties("term construction") {
 
   val anyRef = Select(Ident(TermName("scala")), TypeName("AnyRef"))
 
@@ -265,16 +264,6 @@ object TermConstructionProps extends QuasiquoteProperties("term construction")
   // property("splice targs into classdef") = forAll { (C: TypeName, targs: List[TypeDef], t: Tree) =>
   //   q"class $C[..$targs]" ≈ ...
   // }
-}
-
-trait AnnotationConstr {
-  def annot(name: String): Tree = annot(TypeName(name), Nil)
-  def annot(name: TypeName): Tree = annot(name, Nil)
-  def annot(name: String, args: List[Tree]): Tree = annot(TypeName(name), args)
-  def annot(name: TypeName, args: List[Tree]): Tree = q"new $name(..$args)"
-}
-
-trait AnnotationConstructionProps extends AnnotationConstr { self: TermConstructionProps.type =>
 
   def assertSameAnnots(tree: {def mods: Modifiers}, annots: List[Tree]) =
     assert(tree.mods.annotations ≈ annots,

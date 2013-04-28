@@ -29,6 +29,10 @@ class QuasiquoteProperties(name: String) extends Properties(name) with Arbitrary
     def ≈(other: List[List[Tree]]) = (lst.length == other.length) && lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
   }
 
+  implicit class TestSimilarName(name: Name) {
+    def ≈(other: Name) = name == other
+  }
+
   def assertThrows[T <: AnyRef](f: => Any)(implicit manifest: Manifest[T]): Unit = {
     val clazz = manifest.erasure.asInstanceOf[Class[T]]
     val thrown =
@@ -44,5 +48,10 @@ class QuasiquoteProperties(name: String) extends Properties(name) with Arbitrary
     if(!thrown)
       assert(false, "exception wasn't thrown")
   }
+
+  def annot(name: String): Tree = annot(TypeName(name), Nil)
+  def annot(name: TypeName): Tree = annot(name, Nil)
+  def annot(name: String, args: List[Tree]): Tree = annot(TypeName(name), args)
+  def annot(name: TypeName, args: List[Tree]): Tree = q"new $name(..$args)"
 }
 

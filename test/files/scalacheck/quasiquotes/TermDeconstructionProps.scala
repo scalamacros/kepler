@@ -6,11 +6,7 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction")
-                                  with ApplicationDeconstructionProps
-                                  with AnnotationDeconstructionProps
-
-trait ApplicationDeconstructionProps { self: TermDeconstructionProps.type =>
+object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction") {
 
   property("f(x)") = forAll { (x: Tree) =>
     val q"f($x1)" = q"f($x)"
@@ -36,9 +32,6 @@ trait ApplicationDeconstructionProps { self: TermDeconstructionProps.type =>
     val q"f(...$argss)" = q"f($x1)($x2)"
     argss ≈ List(List(x1), List(x2))
   }
-}
-
-trait AnnotationDeconstructionProps extends AnnotationConstr { self: TermDeconstructionProps.type =>
 
   property("@$annot def foo") = forAll { (annotName: TypeName) =>
     val q"@$annot def foo" = q"@$annotName def foo"
@@ -64,4 +57,46 @@ trait AnnotationDeconstructionProps extends AnnotationConstr { self: TermDeconst
     val q"@$first @..$rest def foo" = q"@$a @$b @$c def foo"
     first ≈ a && rest ≈ List(b, c)
   }
+
+  property("class without params") = test {
+    val q"class $name { ..$body }" = q"class Foo { def bar = 3 }"
+    assert(body ≈ List(q"def bar = 3"))
+  }
+
+  property("class constructor") = test {
+    val q"class $name(...$argss)" = q"class Foo(x: Int)(y: Int)"
+    assert(argss.length == 2)
+  }
+
+  property("class parents") = test {
+    val q"class $name extends ..$parents" = q"class Foo extends Bar with Blah"
+    assert(parents ≈ List(tq"Bar", tq"Blah"))
+  }
+
+  property("class selfdef") = test {
+    val q"class $name { $self => }" = q"class Foo { self: T => }"
+    assert(self.name ≈ TermName("self") && self.tpt ≈ tq"T")
+  }
+
+  property("class tparams") = test {
+    val q"class $name[..$tparams]" = q"class Foo[A, B]"
+    assert(tparams.map { _.name } == List(TypeName("A"), TypeName("B")))
+  }
+
+  // TODO: FIX ME
+  // property("trait deconstruction") = test {
+  //   val q"trait $name { ..$body }" = q"trait Foo { def foo }"
+  //   assert(name ≈ TypeName("Foo") && body ≈ List(q"def foo"))
+  // }
+
+  // TODO: FIX ME
+  // property("deconstruct new") = forAll { (name: TypeName, args: List[Tree]) =>
+  //   val q"new $name1(..$args1)" = q"new $name(..$args)"
+  //   assert(name1 ≈ Ident(name) && args1 ≈ args)
+  // }
+
+  // TODO: FIX ME
+  // property("deconstruct early val defs") = test {
+  //   val q"new { ..$defs } with $bla " = q"new { val x = 0 } with Foo"
+  // }
 }

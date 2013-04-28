@@ -26,11 +26,4 @@ trait StandardLiftables { self: Universe =>
       universe.TypeTree(value.asInstanceOf[universe.WeakTypeTag[_]].tpe)
     }
   }
-
-  implicit def liftSymbol[T <: Symbol]: Liftable[T] = new Liftable[T] {
-    def apply(universe: Universe, value: T): universe.Tree = {
-      requireSameUniverse(universe, "Symbol", value)
-      universe.Ident(value.asInstanceOf[universe.Symbol])
-    }
-  }
 }

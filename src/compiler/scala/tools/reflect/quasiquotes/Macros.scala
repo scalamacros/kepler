@@ -9,12 +9,6 @@ import scala.collection.immutable.ListMap
 trait Macros { self: Quasiquotes =>
   import c.universe._
 
-  /** This is a shorcut variable that links to "$u" universe variable name.
-   *  With the help of it it's possible to use $u inside of the quasiquote
-   *  and it will have the same meaning in expanded code.
-   */
-  val u = nme.UNIVERSE_SHORT
-
   /** This trait abstracts over all variations of quasiquotes
    *  and allows to share core logic. The main differences are
    *  in parser, reifier and wrapping behaviour.
@@ -25,9 +19,6 @@ trait Macros { self: Quasiquotes =>
 
     /** Reifier factory that abstracts over different reifiers need for apply and unapply macros. */
     def reifier(universe: Tree, placeholders: Placeholders): Reifier
-
-    /** Wraps reified tree into a final result of macro expansion. */
-    def wrap(universe: Tree, reified: Tree): Tree
 
     /** Extracts universe tree, args trees and params strings from macroApplication. */
     def extract = c.macroApplication match {
@@ -46,7 +37,7 @@ trait Macros { self: Quasiquotes =>
     /** Generates scala code to be parsed by parser and placeholders map from incoming args and parts. */
     def generate(args: List[Tree], parts: List[String]): (String, Placeholders) = {
       val sb = new StringBuilder()
-      var placeholders = ListMap[String, (Tree, Int)]()
+      var pmap = ListMap[String, (Tree, Int)]()
 
       foreach2(args, parts.init) { (tree, p) =>
         val (part, cardinality) =
@@ -59,15 +50,12 @@ trait Macros { self: Quasiquotes =>
         val freshname = c.fresh(nme.QUASIQUOTE_PREFIX)
         sb.append(part)
         sb.append(freshname)
-        placeholders += freshname -> (tree, cardinality)
+        pmap += freshname -> (tree, cardinality)
       }
       sb.append(parts.last)
 
-      (sb.toString, placeholders)
+      (sb.toString, Placeholders(pmap))
     }
-
-    def debug(msg: String) =
-      if (settings.Yquasiquotedebug.value) println(msg)
 
     /** Quasiquote macro expansion core logic. */
     def apply() = {
@@ -76,35 +64,27 @@ trait Macros { self: Quasiquotes =>
       debug(s"\ncode to parse=\n$code\n")
       val tree = parser.parse(code, placeholders.keys.toSet)
       debug(s"parsed tree\n=${tree}\n=${showRaw(tree)}\n")
-      val reified = reifier(universe, placeholders).reify(tree)
+      val reified = reifier(universe, placeholders).quasiquoteReify(tree)
       debug(s"reified tree\n=${reified}\n=${showRaw(reified)}\n")
-      val result = wrap(universe, reified)
-      debug(s"result tree\n=${result}\n=${showRaw(result)}\n")
-      result
+      reified
     }
   }
 
-  trait ApplyMacro extends AbstractMacro {
+  trait ApplyReification {
     def reifier(universe: Tree, placeholders: Placeholders): Reifier =
-      new ApplyReifier(universe, placeholders)
-    def wrap(universe: Tree, reified: Tree): Tree =
-      q"""{
-        val $u: $universe.type = $universe
-        $reified
-      }"""
+      new ApplyReifierWithSymbolSplicing(universe, placeholders)
   }
 
-  trait UnapplyMacro extends AbstractMacro {
+  trait UnapplyReification {
     def reifier(universe: Tree, placeholders: Placeholders): Reifier =
       new UnapplyReifier(universe, placeholders)
-    def wrap(universe: Tree, reified: Tree) = reified
   }
 
   trait TermParsing { val parser = TermParser }
   trait TypeParsing { val parser = TypeParser }
 
-  def applyQ = (new ApplyMacro with TermParsing).apply()
-  def applyTq = (new ApplyMacro with TypeParsing).apply()
-  def unapplyQ = (new UnapplyMacro with TermParsing).apply()
-  def unapplyTq = (new UnapplyMacro with TypeParsing).apply()
+  def applyQ = (new AbstractMacro with ApplyReification with TermParsing).apply()
+  def applyTq = (new AbstractMacro with ApplyReification with TypeParsing).apply()
+  def unapplyQ = (new AbstractMacro with UnapplyReification with TermParsing).apply()
+  def unapplyTq = (new AbstractMacro with UnapplyReification with TypeParsing).apply()
 }

@@ -4,15 +4,28 @@ package quasiquotes
 import scala.tools.nsc.Global
 import scala.reflect.reify.{Reifier => ReflectReifier}
 import scala.reflect.macros
-import scala.collection.immutable.ListMap
+import scala.collection.{immutable, mutable}
 
 trait Reifiers { self: Quasiquotes =>
   import global._
+  import global.build.DesugaredClassDef
   import global.Flag._
   import global.treeInfo._
   import global.definitions._
 
-  type Placeholders = ListMap[String, (Tree, Int)]
+  case class Placeholders(underlying: immutable.ListMap[String, (Tree, Int)]) {
+    val accessed = mutable.Set[String]()
+    def keys = underlying.keys
+    def contains(key: String) = underlying.contains(key)
+    def apply(key: String) = {
+      accessed += key
+      underlying(key)
+    }
+    def get(key: String) = {
+      accessed += key
+      underlying.get(key)
+    }
+  }
 
   abstract class Reifier(val universe: Tree, val placeholders: Placeholders) extends {
 
@@ -24,25 +37,29 @@ trait Reifiers { self: Quasiquotes =>
 
   } with ReflectReifier with Types {
 
+    // shortcut
+    val u = universe
+
     /** Extractor that matches simple identity-like trees which
      *  correspond to placeholders within quasiquote.
      */
     object Placeholder {
+      def unapply(tree: Tree): Option[String] = tree match {
+        case Ident(PlaceholderName(name)) => Some(name)
+        case TypeDef(_, PlaceholderName(name), List(), TypeBoundsTree(
+          Select(Select(Ident(nme.ROOTPKG), nme.scala_), tpnme.Nothing),
+          Select(Select(Ident(nme.ROOTPKG), nme.scala_), tpnme.Any))) => Some(name)
+        case ValDef(_, PlaceholderName(name), TypeTree(), EmptyTree) => Some(name)
+        case _ => None
+      }
+    }
 
-      def unapply(tree: Tree): Option[String] = {
-        val name = tree match {
-          case Ident(name) => name.toString
-          case TypeDef(_, name, List(), TypeBoundsTree(
-            Select(Select(Ident(nme.ROOTPKG), nme.scala_), tpnme.Nothing),
-            Select(Select(Ident(nme.ROOTPKG), nme.scala_), tpnme.Any))) => name.toString
-          case ValDef(_, name, TypeTree(), EmptyTree) => name.toString
-          case _ => ""
-        }
-        if (placeholders.contains(name))
-          Some(name)
+    object PlaceholderName {
+      def unapply(name: Name): Option[String] =
+        if (placeholders.contains(name.toString))
+          Some(name.toString)
         else
           None
-      }
     }
 
     object AnnotPlaceholder {
@@ -53,17 +70,62 @@ trait Reifiers { self: Quasiquotes =>
       }
     }
 
+    object ModsPlaceholder {
+
+      def unapply(tree: Tree): Option[String] = tree match {
+        case q"new ${Ident(tpnme.QUASIQUOTE_MODS)}(${Literal(Constant(s: String))})" =>
+          Some(s)
+        case _ =>
+          None
+      }
+    }
+
+    def quasiquoteReify(tree: Tree): Tree = {
+      val reified = reifyTree(tree)
+      (placeholders.keys.toSet -- placeholders.accessed).foreach { hole =>
+        c.abort(placeholders(hole)._1.pos, "Can't splice an instance of ${tree.tpe} in this position")
+      }
+      reified
+    }
+
     override def reifyTree(tree: Tree): Tree = reifyBasicTree(tree)
 
-    /** Reifies modifiers with custom list reifier for the annotations.
-     */
-    override def reifyModifiers(m: Modifiers) =
-      mirrorFactoryCall(nme.Modifiers, mirrorBuildCall(nme.flagsFromBits, reify(m.flags)), reify(m.privateWithin), reifyAnnotsList(m.annotations))
+    override def reifyBasicTree(tree: Tree): Tree = tree match {
+      case Literal(Constant(true)) => q"$u.build.True"
+      case Literal(Constant(false)) => q"$u.build.False"
+      case Literal(Constant(0)) => q"$u.build.Zero"
+      case Literal(Constant(null)) => q"$u.build.Zero"
+      case Literal(Constant(())) => q"$u.build.Unit"
+      case _ => super.reifyBasicTree(tree)
+    }
 
-    def reifyAnnotsList(annots: List[Tree]): Tree = ???
+    // TODO: make sure that this list is complete
+    final val inlineFlags = List(
+      PRIVATE, PROTECTED, LAZY, IMPLICIT,
+      CASE, FINAL, COVARIANT, CONTRAVARIANT,
+      OVERRIDE, SEALED)
+
+    def requireNoInlineFlags(m: Modifiers, pos: Position, action: String) = {
+      val flags = m.flags
+      inlineFlags.foreach { f =>
+        require((flags & f) == 0L, pos, "Can't $action Modifiers together with inline Flags.")
+      }
+    }
+
+    override def mirrorSelect(name: String): Tree =
+      Select(universe, TermName(name))
+
+    override def mirrorCall(name: TermName, args: Tree*): Tree =
+      Apply(Select(universe, name), args.toList)
+
+    override def mirrorBuildCall(name: TermName, args: Tree*): Tree =
+      Apply(Select(Select(universe, nme.build), name), args.toList)
   }
 
   class ApplyReifier(universe: Tree, placeholders: Placeholders) extends Reifier(universe, placeholders) {
+
+    def isSupportedZeroCardinalityType(tpe: Type): Boolean =
+      tpe <:< treeType || tpe <:< nameType || tpe <:< modsType || tpe <:< flagsType
 
     object CorrespondsTo {
 
@@ -72,7 +134,7 @@ trait Reifiers { self: Quasiquotes =>
       def unapply(name: String): Option[(Tree, Type)] =
         placeholders.get(name).flatMap { case (tree, card) =>
           (card, tree.tpe) match {
-            case (0, tpe) if tpe <:< treeType || tpe <:< nameType =>
+            case (0, tpe) if isSupportedZeroCardinalityType(tpe) =>
               Some((tree, tpe))
             case (0, LiftableType(lift)) =>
               Some((wrapLift(lift, tree), treeType))
@@ -144,6 +206,10 @@ trait Reifiers { self: Quasiquotes =>
       case Placeholder(name) if placeholders(name)._2 > 0 =>
         val (tree, card) = placeholders(name)
         c.abort(tree.pos, s"Can't splice tree with '${fmtCard(card)}' cardinality in this position.")
+      case DesugaredClassDef(mods, name, tparams, constrmods, argss, parents, selfval, body) =>
+        mirrorBuildCall("DesugaredClassDef", reifyModifiers(mods), reifyName(name),
+                        reifyList(tparams), reifyModifiers(constrmods), reifyList(argss),
+                        reifyList(parents), reifyTree(selfval), reifyList(body))
       case _ =>
         super.reifyBasicTree(tree)
     }
@@ -209,7 +275,7 @@ trait Reifiers { self: Quasiquotes =>
      *  and additional $u.build.annotationRepr wrapping is needed to ensure that user won't
      *  splice a non-constructor call in this position.
      */
-    override def reifyAnnotsList(annots: List[Tree]): Tree = reifyListGeneric(annots) {
+    def reifyAnnotsList(annots: List[Tree]): Tree = reifyListGeneric(annots) {
       case AnnotPlaceholder(CorrespondsTo(tree, tpe), args) if tpe <:< iterableTreeType =>
         val x: TermName = c.freshName()
         q"$tree.map { $x => $u.build.annotationRepr($x, ${reify(args)}) }"
@@ -218,11 +284,53 @@ trait Reifiers { self: Quasiquotes =>
         q"$u.build.annotationRepr($tree, ${reify(args)})"
       case other => reify(other)
     }
+
+    override def reifyModifiers(m: Modifiers) = {
+      val (modsholes, annots) = m.annotations.partition {
+        case ModsPlaceholder(_) => true
+        case _ => false
+      }
+      val (mods, flags) = modsholes.map {
+        case ModsPlaceholder(CorrespondsTo((tree, tpe))) => (tree, tpe)
+      }.partition { case (tree, tpe) =>
+        if (tpe <:< modsType)
+          true
+        else if (tpe <:< flagsType)
+          false
+        else
+          c.abort(tree.pos, "Intance of FlagSet or Modifiers type is expected here but ${tree.tpe} found")
+      }
+      if (mods.nonEmpty) {
+        val (tree, tpe) = mods(0)
+        require(mods.length == 1, mods(1)._1.pos, "Can't splice multiple Modifiers")
+        require(flags.isEmpty, flags(0)._1.pos, "Can't splice Flags together with Modifiers")
+        require(annots.isEmpty, tree.pos, "Can't splice Modifiers together with additional annotations")
+        requireNoInlineFlags(m, tree.pos, "splice")
+        tree
+      } else {
+        val baseFlags = mirrorBuildCall(nme.flagsFromBits, reify(m.flags))
+        val reifiedFlags = flags.foldLeft[Tree](baseFlags) { case (flag, (tree, _)) => q"$flag | $tree" }
+        mirrorFactoryCall(nme.Modifiers, reifiedFlags, reify(m.privateWithin), reifyAnnotsList(annots))
+      }
+    }
+  }
+
+  class ApplyReifierWithSymbolSplicing(universe: Tree, placeholders: Placeholders) extends ApplyReifier(universe, placeholders) {
+
+    override def isSupportedZeroCardinalityType(tpe: Type) =
+      super.isSupportedZeroCardinalityType(tpe) || tpe <:< symbolType
+
+    override def reifyBasicTree(tree: Tree): Tree = tree match {
+      case Ident(PlaceholderName(CorrespondsTo(sym, tpe))) if tpe <:< symbolType =>
+        q"$u.Ident($sym)"
+      case Select(tree, PlaceholderName(CorrespondsTo(sym, tpe))) if tpe <:< symbolType =>
+        q"$u.Select(${reifyTree(tree)}, $sym)"
+      case _ =>
+        super.reifyBasicTree(tree)
+    }
   }
 
   class UnapplyReifier(universe: Tree, placeholders: Placeholders) extends Reifier(universe, placeholders) {
-
-    val u = universe
 
     object CorrespondsTo {
       def unapply(name: String): Option[(Tree, Int)] =
@@ -243,6 +351,10 @@ trait Reifiers { self: Quasiquotes =>
           mirrorBuildCall("Applied", reify(fun), reifyList(targs), reifyList(argss))
         else
           mirrorBuildCall("Applied2", reify(fun), reifyList(argss))
+      case DesugaredClassDef(mods, name, tparams, constrmods, argss, parents, selfval, body) =>
+        mirrorBuildCall("DesugaredClassDef", reifyModifiers(mods), reifyName(name),
+                        reifyList(tparams), reifyModifiers(constrmods), reifyList(argss),
+                        reifyList(parents), reifyTree(selfval), reifyList(body))
       case _ =>
         super.reifyBasicTree(tree)
     }
@@ -274,7 +386,7 @@ trait Reifiers { self: Quasiquotes =>
       reify _
     }
 
-    override def reifyAnnotsList(annots: List[Tree]): Tree = reifyListGeneric(annots) {
+    def reifyAnnotsList(annots: List[Tree]): Tree = reifyListGeneric(annots) {
       case AnnotPlaceholder(CorrespondsTo(tree, 1), Nil) => tree
     } {
       case AnnotPlaceholder(CorrespondsTo(tree, 0), args) =>
@@ -286,19 +398,20 @@ trait Reifiers { self: Quasiquotes =>
         reify(other)
     }
 
-    override def reifyModifiers(m: global.Modifiers) =
-      mirrorFactoryCall(nme.Modifiers, mirrorBuildCall("FlagsAsBits", reify(m.flags)),
-                                       reify(m.privateWithin), reifyAnnotsList(m.annotations))
-
-
-    override def mirrorSelect(name: String): Tree =
-      Select(universe, TermName(name))
-
-    override def mirrorCall(name: TermName, args: Tree*): Tree =
-      Apply(Select(universe, name), args.toList)
-
-    override def mirrorBuildCall(name: TermName, args: Tree*): Tree =
-      Apply(Select(Select(universe, nme.build), name), args.toList)
+    override def reifyModifiers(m: Modifiers) = {
+      val mods = m.annotations.collect {
+        case ModsPlaceholder(CorrespondsTo(tree, _)) => tree
+      }
+      if (mods.nonEmpty) {
+        val tree = mods(0)
+        require(mods.length == 1, mods(1).pos, "Can't extract multiple Modifiers")
+        require(m.annotations.length == 1, tree.pos, "Can't extract Modifiers together with additional annotations")
+        requireNoInlineFlags(m, tree.pos, "extract")
+        tree
+      } else
+        mirrorFactoryCall(nme.Modifiers, mirrorBuildCall("FlagsAsBits", reify(m.flags)),
+                                         reify(m.privateWithin), reifyAnnotsList(m.annotations))
+    }
   }
 
   trait Types {
@@ -308,6 +421,9 @@ trait Reifiers { self: Quasiquotes =>
     lazy val nameType = memberType(universeType, tpnme.Name)
     lazy val termNameType = memberType(universeType, tpnme.TypeName)
     lazy val typeNameType = memberType(universeType, tpnme.TermName)
+    lazy val modsType = memberType(universeType, tpnme.Modifiers)
+    lazy val flagsType = memberType(universeType, tpnme.FlagSet)
+    lazy val symbolType = memberType(universeType, tpnme.Symbol)
     lazy val treeType = memberType(universeType, tpnme.Tree)
     lazy val typeDefType = memberType(universeType, tpnme.TypeDef)
     lazy val liftableType = LiftableClass.toType

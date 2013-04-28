@@ -225,7 +225,7 @@ abstract class TreeBuilder {
             atPos(cpos) {
               ClassDef(
                 Modifiers(FINAL), x, Nil,
-                Template(parents, self, NoMods, ListOfNil, stats, cpos.focus))
+                gen.mkTemplate(parents, self, NoMods, ListOfNil, stats, cpos.focus))
             }),
           atPos(npos) {
             New(

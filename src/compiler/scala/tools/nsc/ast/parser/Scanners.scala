@@ -80,7 +80,21 @@ trait Scanners extends ScannersCommon {
     }
   }
 
-  abstract class Scanner extends CharArrayReader with TokenData with ScannerCommon {
+  trait ScannerData extends TokenData {
+    var ch: Char
+    var charOffset: Int
+    var lineStartOffset: Int
+    var lastLineStartOffset: Int
+    def copyFrom(sd: ScannerData) = {
+      this.ch = sd.ch
+      this.charOffset = sd.charOffset
+      this.lineStartOffset = sd.lineStartOffset
+      this.lastLineStartOffset = sd.lastLineStartOffset
+      super.copyFrom(sd)
+    }
+  }
+
+  abstract class Scanner extends CharArrayReader with TokenData with ScannerData with ScannerCommon {
     private def isDigit(c: Char) = java.lang.Character isDigit c
 
     def isAtEnd = charOffset >= buf.length
