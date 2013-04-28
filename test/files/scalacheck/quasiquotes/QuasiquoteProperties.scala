@@ -3,7 +3,7 @@ import Prop._
 import Gen._
 import Arbitrary._
 
-import scala.reflect.runtime.universe.Tree
+import scala.reflect.runtime.universe._
 
 class QuasiquoteProperties(name: String) extends Properties(name) with ArbitraryTreesAndNames {
 
@@ -27,6 +27,22 @@ class QuasiquoteProperties(name: String) extends Properties(name) with Arbitrary
 
   implicit class TestSimilarListListTree(lst: List[List[Tree]]) {
     def ≈(other: List[List[Tree]]) = (lst.length == other.length) && lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
+  }
+
+  def assertThrows[T <: AnyRef](f: => Any)(implicit manifest: Manifest[T]): Unit = {
+    val clazz = manifest.erasure.asInstanceOf[Class[T]]
+    val thrown =
+      try {
+        f
+        false
+      } catch {
+        case u: Throwable =>
+          if (!clazz.isAssignableFrom(u.getClass))
+            assert(false, s"wrong exception: $u")
+          true
+      }
+    if(!thrown)
+      assert(false, "exception wasn't thrown")
   }
 }
 

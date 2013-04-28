@@ -23,4 +23,11 @@ object Liftable {
   implicit lazy val liftBoolean: Liftable[Boolean] = new LiftableConstant[Boolean]
   implicit lazy val liftString: Liftable[String] = new LiftableConstant[String]
   implicit lazy val liftUnit: Liftable[Unit] = new LiftableConstant[Unit]
+
+  implicit lazy val liftScalaSymbol: Liftable[scala.Symbol] = new Liftable[scala.Symbol] {
+    def apply(universe: Universe, value: scala.Symbol): universe.Tree = {
+      import universe._
+      q"scala.Symbol(${value.name})"
+    }
+  }
 }

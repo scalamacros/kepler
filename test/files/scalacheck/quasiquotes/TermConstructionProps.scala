@@ -6,7 +6,8 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object TermConstructionProps extends QuasiquoteProperties("term construction") {
+object TermConstructionProps extends QuasiquoteProperties("term construction")
+                                with AnnotationConstructionProps {
 
   val anyRef = Select(Ident(TermName("scala")), TypeName("AnyRef"))
 
@@ -264,4 +265,80 @@ object TermConstructionProps extends QuasiquoteProperties("term construction") {
   // property("splice targs into classdef") = forAll { (C: TypeName, targs: List[TypeDef], t: Tree) =>
   //   q"class $C[..$targs]" ≈ ...
   // }
+}
+
+trait AnnotationConstr {
+  def annot(name: String): Tree = annot(TypeName(name), Nil)
+  def annot(name: TypeName): Tree = annot(name, Nil)
+  def annot(name: String, args: List[Tree]): Tree = annot(TypeName(name), args)
+  def annot(name: TypeName, args: List[Tree]): Tree = q"new $name(..$args)"
+}
+
+trait AnnotationConstructionProps extends AnnotationConstr { self: TermConstructionProps.type =>
+
+  def assertSameAnnots(tree: {def mods: Modifiers}, annots: List[Tree]) =
+    assert(tree.mods.annotations ≈ annots,
+           s"${tree.mods.annotations} =/= ${annots}")
+
+  def assertSameAnnots(tree1: {def mods: Modifiers}, tree2: {def mods: Modifiers}) =
+    assert(tree1.mods.annotations ≈ tree2.mods.annotations,
+           s"${tree1.mods.annotations} =/= ${tree2.mods.annotations}")
+
+  property("splice type name into annotation") = test {
+    val name = TypeName("annot")
+    assertSameAnnots(q"@$name def foo", List(annot(name)))
+  }
+
+  property("splice ident into annotation") = test {
+    val name = TypeName("annot")
+    val ident = Ident(name)
+    assertSameAnnots(q"@$ident def foo", List(annot(name)))
+  }
+
+  property("splice idents into annotation") = test {
+    val idents = List(Ident(TypeName("annot1")), Ident(TypeName("annot2")))
+    assertSameAnnots(q"@..$idents def foo",
+      idents.map { ident => Apply(Select(New(ident), nme.CONSTRUCTOR), List()) })
+  }
+
+  property("splice constructor calls into annotation") = test {
+    val ctorcalls = List(annot("a1"), annot("a2"))
+    assertSameAnnots(q"@..$ctorcalls def foo", ctorcalls)
+  }
+
+  property("splice multiple annotations (1)") = test {
+    val annot1 = annot("a1")
+    val annot2 = annot("a2")
+    val res = q"@$annot1 @$annot2 def foo"
+    assertSameAnnots(res, List(annot1, annot2))
+  }
+
+  property("splice multiple annotations (2)") = test {
+    val annot1 = annot("a1")
+    val annots = List(annot("a2"), annot("a3"))
+    val res = q"@$annot1 @..$annots def foo"
+    assertSameAnnots(res, annot1 :: annots)
+  }
+
+  property("splice annotations with arguments (1)") = test {
+    val a = annot("a", List(q"x"))
+    assertSameAnnots(q"@$a def foo", q"@a(x) def foo")
+  }
+
+  property("splice annotations with arguments (2)") = test {
+    val a = TypeName("a")
+    assertSameAnnots(q"@$a(x) def foo", q"@a(x) def foo")
+  }
+
+  property("splice annotations with arguments (3") = test {
+    val a = Ident(TypeName("a"))
+    assertSameAnnots(q"@$a(x) def foo", q"@a(x) def foo")
+  }
+
+  property("can't splice annotations with arguments specificed twice") = test {
+    val a = annot("a", List(q"x"))
+    assertThrows[IllegalArgumentException] {
+      q"@$a(y) def foo"
+    }
+  }
 }

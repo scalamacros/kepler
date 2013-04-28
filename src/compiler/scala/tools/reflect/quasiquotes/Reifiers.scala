@@ -45,7 +45,22 @@ trait Reifiers { self: Quasiquotes =>
       }
     }
 
+    object AnnotPlaceholder {
+
+      def unapply(tree: Tree): Option[(String, List[Tree])] = tree match {
+        case Apply(Select(New(Placeholder(name)), nme.CONSTRUCTOR), args) => Some((name, args))
+        case _ => None
+      }
+    }
+
     override def reifyTree(tree: Tree): Tree = reifyBasicTree(tree)
+
+    /** Reifies modifiers with custom list reifier for the annotations.
+     */
+    override def reifyModifiers(m: Modifiers) =
+      mirrorFactoryCall(nme.Modifiers, mirrorBuildCall(nme.flagsFromBits, reify(m.flags)), reify(m.privateWithin), reifyAnnotsList(m.annotations))
+
+    def reifyAnnotsList(annots: List[Tree]): Tree = ???
   }
 
   class ApplyReifier(universe: Tree, placeholders: Placeholders) extends Reifier(universe, placeholders) {
@@ -64,7 +79,11 @@ trait Reifiers { self: Quasiquotes =>
             case (card, iterable) if card > 0 && iterable <:< iterableType =>
               extractIterableN(card, iterable).map {
                 case tpe if tpe <:< treeType =>
-                  Some((wrapIterableN(tree, card) { t => t }, iterableN(card, tpe)))
+                  if (iterable <:< listTreeType || iterable <:< listListTreeType) {
+                    Some(tree, iterable)
+                  } else {
+                    Some((wrapIterableN(tree, card) { t => t }, iterableN(card, tpe)))
+                  }
                 case LiftableType(lift) =>
                   Some((wrapIterableN(tree, card) { t => wrapLift(lift, t) }, iterableN(card, treeType)))
                 case tpe =>
@@ -139,25 +158,83 @@ trait Reifiers { self: Quasiquotes =>
         super.reifyName(name)
     }
 
-    override def reifyList(xs: List[Any]): Tree =
-      Select(
-        mkList(xs.map {
-          case Placeholder(CorrespondsTo(tree, tpe)) if tpe <:< iterableTreeType => tree
-          case List(Placeholder(CorrespondsTo(tree, tpe))) if tpe <:< iterableIterableTreeType => tree
-          case x @ _ => mkList(List(reify(x)))
-        }),
-        nme.flatten)
+    /** Splits list into a list of groups where subsequent elements are condidered
+     *  similar by the corresponding function.
+     *
+     *  For example:
+     *
+     *  > group(List(1, 1, 0, 0, 1, 0)) { _ == _ }
+     *  List(List(1, 1), List(0, 0), List(1), List(0))
+     *
+     */
+    def group[T](lst: List[T])(similar: (T, T) => Boolean) = lst.foldLeft[List[List[T]]](List()) {
+      case (Nil, el) => List(List(el))
+      case (ll :+ (last @ (lastinit :+ lastel)), el) if similar(lastel, el) => ll :+ (last :+ el)
+      case (ll, el) => ll :+ List(el)
+    }
+
+    /** Reifies list filling all the valid placeholders.
+     *
+     *  Reification of non-trivial list is done in two steps:
+     *  1. split the list into groups where every placeholder is always
+     *     put in a group of it's own and all subsquent non-placeholders are
+     *     grouped together; element is considered to be a placeholder if it's
+     *     in the domain of the fill function;
+     *  2. fold the groups into a sequence of lists added together with ++ using
+     *     fill reification for placeholders and fallback reification for non-placeholders.
+     */
+    def reifyListGeneric[T](xs: List[T])(fill: PartialFunction[T, Tree])(fallback: T => Tree): Tree =
+      xs match {
+        case Nil => mkList(Nil)
+        case _ =>
+          def reifyGroup(group: List[T]): Tree = group match {
+            case List(elem) if fill.isDefinedAt(elem) => fill(elem)
+            case elems => mkList(elems.map(fallback))
+          }
+          val head :: tail = group(xs) { (a, b) => !fill.isDefinedAt(a) && !fill.isDefinedAt(b) }
+          tail.foldLeft[Tree](reifyGroup(head)) { (tree, lst) => q"$tree ++ ${reifyGroup(lst)}" }
+      }
+
+    /** Reifies arbitrary list filling ..$x and ...$y placeholders when they are put
+     *  in the correct position. Fallbacks to super.reifyList for non-placeholders.
+     */
+    override def reifyList(xs: List[Any]): Tree = reifyListGeneric(xs) {
+      case Placeholder(CorrespondsTo(tree, tpe)) if tpe <:< iterableTreeType => tree
+      case List(Placeholder(CorrespondsTo(tree, tpe))) if tpe <:< iterableIterableTreeType => tree
+    } {
+      reify(_)
+    }
+
+    /** Custom list reifier for annotations. It's required because they have different shape
+     *  and additional $u.build.annotationRepr wrapping is needed to ensure that user won't
+     *  splice a non-constructor call in this position.
+     */
+    override def reifyAnnotsList(annots: List[Tree]): Tree = reifyListGeneric(annots) {
+      case AnnotPlaceholder(CorrespondsTo(tree, tpe), args) if tpe <:< iterableTreeType =>
+        val x: TermName = c.freshName()
+        q"$tree.map { $x => $u.build.annotationRepr($x, ${reify(args)}) }"
+    } {
+      case AnnotPlaceholder(CorrespondsTo(tree, tpe), args) if tpe <:< treeType =>
+        q"$u.build.annotationRepr($tree, ${reify(args)})"
+      case other => reify(other)
+    }
   }
 
   class UnapplyReifier(universe: Tree, placeholders: Placeholders) extends Reifier(universe, placeholders) {
+
+    val u = universe
+
+    object CorrespondsTo {
+      def unapply(name: String): Option[(Tree, Int)] =
+        placeholders.get(name)
+    }
 
     override def reifyBasicTree(tree: Tree): Tree = tree match {
       case global.emptyValDef =>
         mirrorBuildCall("EmptyValDefLike")
       case global.pendingSuperCall =>
         mirrorBuildCall("PendingSuperCallLike")
-      case Placeholder(name) =>
-        val (tree, card) = placeholders(name.toString)
+      case Placeholder(CorrespondsTo(tree, card)) =>
         if (card > 0)
           c.abort(tree.pos, s"Can't extract a part of the tree with '${fmtCard(card)}' cardinality in this position.")
         tree
@@ -180,26 +257,39 @@ trait Reifiers { self: Quasiquotes =>
         placeholders(name.toString)._1
       }
 
-    override def reifyModifiers(m: global.Modifiers) =
-      mirrorFactoryCall(nme.Modifiers, mirrorBuildCall("FlagsAsBits", reify(m.flags)), reify(m.privateWithin), reify(m.annotations))
-
-    override def reifyList(xs: List[Any]): Tree = {
-      val last = if (xs.length > 0) xs.last else EmptyTree
-      last match {
-        case Placeholder(name) if placeholders(name)._2 == 1 =>
-          val bnd = placeholders(name.toString)._1
-          xs.init.foldRight[Tree](bnd) { (el, rest) =>
-            scalaFactoryCall("collection.immutable.$colon$colon", reify(el), rest)
-          }
-        case List(Placeholder(name)) if placeholders(name)._2 == 2 =>
-          val bnd = placeholders(name.toString)._1
-          xs.init.foldRight[Tree](bnd) { (el, rest) =>
-            scalaFactoryCall("collection.immutable.$colon$colon", reify(el), rest)
+    def reifyListGeneric(xs: List[Any])(fill: PartialFunction[Any, Tree])(fallback: Any => Tree) =
+      xs match {
+        case init :+ last if fill.isDefinedAt(last) =>
+          init.foldRight[Tree](fill(last)) { (el, rest) =>
+            q"scala.collection.immutable.$$colon$$colon(${fallback(el)}, $rest)"
           }
         case _ =>
-          super.reifyList(xs)
+          mkList(xs.map(fallback))
       }
+
+    override def reifyList(xs: List[Any]): Tree = reifyListGeneric(xs) {
+      case Placeholder(CorrespondsTo(tree, 1)) => tree
+      case List(Placeholder(CorrespondsTo(tree, 2))) => tree
+    } {
+      reify _
     }
+
+    override def reifyAnnotsList(annots: List[Tree]): Tree = reifyListGeneric(annots) {
+      case AnnotPlaceholder(CorrespondsTo(tree, 1), Nil) => tree
+    } {
+      case AnnotPlaceholder(CorrespondsTo(tree, 0), args) =>
+        args match {
+          case Nil => tree
+          case _ => q"$u.Apply($u.Select($u.New($tree), $u.nme.CONSTRUCTOR), ${reify(args)})"
+        }
+      case other =>
+        reify(other)
+    }
+
+    override def reifyModifiers(m: global.Modifiers) =
+      mirrorFactoryCall(nme.Modifiers, mirrorBuildCall("FlagsAsBits", reify(m.flags)),
+                                       reify(m.privateWithin), reifyAnnotsList(m.annotations))
+
 
     override def mirrorSelect(name: String): Tree =
       Select(universe, TermName(name))
@@ -224,6 +314,9 @@ trait Reifiers { self: Quasiquotes =>
     lazy val iterableType = appliedType(IterableClass.toType, List(AnyTpe))
     lazy val iterableTreeType = appliedType(iterableType, List(treeType))
     lazy val iterableIterableTreeType = appliedType(iterableType, List(iterableTreeType))
+    lazy val listType = appliedType(ListClass.toType, List(AnyTpe))
+    lazy val listTreeType = appliedType(listType, List(treeType))
+    lazy val listListTreeType = appliedType(listType, List(listTreeType))
     lazy val optionTreeType = appliedType(OptionClass.toType, List(treeType))
     lazy val optionNameType = appliedType(OptionClass.toType, List(nameType))
   }

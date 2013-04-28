@@ -1,7 +1,7 @@
 package scala.reflect
 package api
 
-trait StdLiftables { self: Universe =>
+trait StandardLiftables { self: Universe =>
 
   private def requireSameUniverse[T](universe: Universe, tp: String, value: T) =
     require(universe eq self, s"Can't lift $tp ${showRaw(value)} from universe ${showRaw(universe)} using lift$tp defined for ${showRaw(self)}.")

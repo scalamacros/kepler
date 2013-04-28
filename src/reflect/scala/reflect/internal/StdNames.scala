@@ -312,8 +312,6 @@ trait StdNames {
     val REIFY_FREE_VALUE_SUFFIX: NameType  = "$value"
     val REIFY_SYMDEF_PREFIX: NameType      = "symdef$"
     val QUASIQUOTE_PREFIX: String          = "$quasiquote$"
-    val QUASIQUOTE_MATCHER_PACKAGE: NameType = "$quasiquote$"
-    val QUASIQUOTE_MATCHER_NAME: NameType  = "$matcher$"
     val MIXIN_CONSTRUCTOR: NameType        = "$init$"
     val MODULE_INSTANCE_FIELD: NameType    = NameTransformer.MODULE_INSTANCE_NAME  // "MODULE$"
     val OUTER: NameType                    = "$outer"

@@ -75,6 +75,8 @@ private[reflect] trait BuildUtils { self: Universe =>
 
     def setSymbol[T <: Tree](tree: T, sym: Symbol): T
 
+    def annotationRepr(tree: Tree, args: List[Tree]): Tree
+
     val FlagsAsBits: FlagsAsBitsExtractor
 
     trait FlagsAsBitsExtractor {
