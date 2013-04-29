@@ -8,7 +8,7 @@ import scala.collection.{immutable, mutable}
 
 trait Reifiers { self: Quasiquotes =>
   import global._
-  import global.build.DesugaredClassDef
+  import global.build.SyntacticalClassDef
   import global.Flag._
   import global.treeInfo._
   import global.definitions._
@@ -206,8 +206,8 @@ trait Reifiers { self: Quasiquotes =>
       case Placeholder(name) if placeholders(name)._2 > 0 =>
         val (tree, card) = placeholders(name)
         c.abort(tree.pos, s"Can't splice tree with '${fmtCard(card)}' cardinality in this position.")
-      case DesugaredClassDef(mods, name, tparams, constrmods, argss, parents, selfval, body) =>
-        mirrorBuildCall("DesugaredClassDef", reifyModifiers(mods), reifyName(name),
+      case SyntacticalClassDef(mods, name, tparams, constrmods, argss, parents, selfval, body) =>
+        mirrorBuildCall("SyntacticalClassDef", reifyModifiers(mods), reifyName(name),
                         reifyList(tparams), reifyModifiers(constrmods), reifyList(argss),
                         reifyList(parents), reifyTree(selfval), reifyList(body))
       case _ =>
@@ -351,8 +351,8 @@ trait Reifiers { self: Quasiquotes =>
           mirrorBuildCall("Applied", reify(fun), reifyList(targs), reifyList(argss))
         else
           mirrorBuildCall("Applied2", reify(fun), reifyList(argss))
-      case DesugaredClassDef(mods, name, tparams, constrmods, argss, parents, selfval, body) =>
-        mirrorBuildCall("DesugaredClassDef", reifyModifiers(mods), reifyName(name),
+      case SyntacticalClassDef(mods, name, tparams, constrmods, argss, parents, selfval, body) =>
+        mirrorBuildCall("SyntacticalClassDef", reifyModifiers(mods), reifyName(name),
                         reifyList(tparams), reifyModifiers(constrmods), reifyList(argss),
                         reifyList(parents), reifyTree(selfval), reifyList(body))
       case _ =>

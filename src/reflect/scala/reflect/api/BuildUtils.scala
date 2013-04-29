@@ -107,9 +107,9 @@ private[reflect] trait BuildUtils { self: Universe =>
       def unapply(tree: Tree): Option[(Tree, List[List[Tree]])]
     }
 
-    val DesugaredClassDef: DesugaredClassDefExtractor
+    val SyntacticalClassDef: SyntacticalClassDefExtractor
 
-    trait DesugaredClassDefExtractor {
+    trait SyntacticalClassDefExtractor {
       def apply(mods: Modifiers, name: TypeName, tparams: List[TypeDef],
                 constrMods: Modifiers, vparamss: List[List[ValDef]], parents: List[Tree],
                 selfdef: ValDef, body: List[Tree]): Tree

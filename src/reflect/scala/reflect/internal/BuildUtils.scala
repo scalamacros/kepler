@@ -106,7 +106,7 @@ trait BuildUtils { self: SymbolTable =>
       }
     }
 
-    object DesugaredClassDef extends DesugaredClassDefExtractor {
+    object SyntacticalClassDef extends SyntacticalClassDefExtractor {
       def apply(mods: Modifiers, name: TypeName, tparams: List[TypeDef],
                 constrMods: Modifiers, vparamss: List[List[ValDef]], parents: List[Tree],
                 selfdef: ValDef, body: List[Tree]): Tree =
