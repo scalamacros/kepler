@@ -240,6 +240,7 @@ trait StdNames {
     final val TypeDef: NameType             = "TypeDef"
     final val Tuple: NameType               = "Tuple"
     final val Universe: NameType            = "Universe"
+    final val Quasiquote: NameType          = "Quasiquote"
 
     // Annotation simple names, used in Namer
     final val BeanPropertyAnnot: NameType = "BeanProperty"
@@ -730,6 +731,8 @@ trait StdNames {
     val view_ : NameType               = "view"
     val wait_ : NameType               = "wait"
     val withFilter: NameType           = "withFilter"
+    val q: NameType                    = "q"
+    val tq: NameType                   = "tq"
 
     // unencoded operators
     object raw {

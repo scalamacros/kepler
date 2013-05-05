@@ -90,15 +90,6 @@ trait Reifiers { self: Quasiquotes =>
 
     override def reifyTree(tree: Tree): Tree = reifyBasicTree(tree)
 
-    override def reifyBasicTree(tree: Tree): Tree = tree match {
-      case Literal(Constant(true)) => q"$u.build.True"
-      case Literal(Constant(false)) => q"$u.build.False"
-      case Literal(Constant(0)) => q"$u.build.Zero"
-      case Literal(Constant(null)) => q"$u.build.Zero"
-      case Literal(Constant(())) => q"$u.build.Unit"
-      case _ => super.reifyBasicTree(tree)
-    }
-
     // TODO: make sure that this list is complete
     final val inlineFlags = List(
       PRIVATE, PROTECTED, LAZY, IMPLICIT,
@@ -197,6 +188,8 @@ trait Reifiers { self: Quasiquotes =>
     }
 
     override def reifyBasicTree(tree: Tree): Tree = tree match {
+      case Literal(Constant(true)) => q"$u.build.True"
+      case Literal(Constant(false)) => q"$u.build.False"
       case Placeholder(CorrespondsTo(tree, tpe)) if tpe <:< treeType => tree
       case Apply(f, List(Placeholder(CorrespondsTo(argss, tpe)))) if tpe <:< iterableIterableTreeType =>
         val f1 = reifyTree(f)

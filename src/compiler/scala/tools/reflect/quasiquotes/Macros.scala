@@ -15,7 +15,7 @@ trait Macros { self: Quasiquotes =>
    */
   trait AbstractMacro {
 
-    val parser: Parser
+    def parse(code: String, placeholders: Set[String]): Tree
 
     /** Reifier factory that abstracts over different reifiers need for apply and unapply macros. */
     def reifier(universe: Tree, placeholders: Placeholders): Reifier
@@ -62,7 +62,7 @@ trait Macros { self: Quasiquotes =>
       val (universe, args, parts) = extract
       val (code, placeholders) = generate(args, parts)
       debug(s"\ncode to parse=\n$code\n")
-      val tree = parser.parse(code, placeholders.keys.toSet)
+      val tree = parse(code, placeholders.keys.toSet)
       debug(s"parsed tree\n=${tree}\n=${showRaw(tree)}\n")
       val reified = reifier(universe, placeholders).quasiquoteReify(tree)
       debug(s"reified tree\n=${reified}\n=${showRaw(reified)}\n")
@@ -80,8 +80,18 @@ trait Macros { self: Quasiquotes =>
       new UnapplyReifier(universe, placeholders)
   }
 
-  trait TermParsing { val parser = TermParser }
-  trait TypeParsing { val parser = TypeParser }
+  trait TermParsing {
+    def parse(code: String, placeholders: Set[String]): Tree =
+      if (code.trim.startsWith("case"))
+        CaseParser.parse(code, placeholders)
+      else
+        TermParser.parse(code, placeholders)
+  }
+
+  trait TypeParsing {
+    def parse(code: String, placeholders: Set[String]): Tree =
+      TypeParser.parse(code, placeholders)
+  }
 
   def applyQ = (new AbstractMacro with ApplyReification with TermParsing).apply()
   def applyTq = (new AbstractMacro with ApplyReification with TypeParsing).apply()

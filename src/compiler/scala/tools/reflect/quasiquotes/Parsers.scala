@@ -139,6 +139,18 @@ trait Parsers { self: Quasiquotes =>
 
   object TermParser extends Parser
 
+  object CaseParser extends Parser {
+
+    override def wrapCode(code: String) = super.wrapCode("something match { " + code + " }")
+
+    override def unwrapTree(wrappedTree: Tree): Tree = {
+      val Match(_, head :: tail) = super.unwrapTree(wrappedTree)
+      if (tail.nonEmpty)
+        c.abort(c.macroApplication.pos, "can't parse more than one casedef, generate match tree instead")
+      head
+    }
+  }
+
   object TypeParser extends Parser {
 
     override def wrapCode(code: String) = super.wrapCode("type T = " + code)

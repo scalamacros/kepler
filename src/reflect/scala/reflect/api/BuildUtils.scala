@@ -117,10 +117,7 @@ private[reflect] trait BuildUtils { self: Universe =>
                                        List[List[ValDef]], List[Tree], ValDef, List[Tree])]
     }
 
-    val True: Tree
-    val False: Tree
-    val Zero: Tree
-    val Null: Tree
-    val Unit: Tree
+    def True: Tree
+    def False: Tree
   }
 }
