@@ -14,7 +14,6 @@ trait Macros { self: Quasiquotes =>
    *  in parser, reifier and wrapping behaviour.
    */
   trait AbstractMacro {
-
     def parse(code: String, placeholders: Set[String]): Tree
 
     /** Reifier factory that abstracts over different reifiers need for apply and unapply macros. */
@@ -41,12 +40,9 @@ trait Macros { self: Quasiquotes =>
 
       foreach2(args, parts.init) { (tree, p) =>
         val (part, cardinality) =
-          if (p.endsWith("..."))
-            (p.stripSuffix("..."), 2)
-          else if (p.endsWith(".."))
-            (p.stripSuffix(".."), 1)
-          else
-            (p, 0)
+          if (p.endsWith("...")) (p.stripSuffix("..."), 2)
+          else if (p.endsWith("..")) (p.stripSuffix(".."), 1)
+          else (p, 0)
         val freshname = c.fresh(nme.QUASIQUOTE_PREFIX)
         sb.append(part)
         sb.append(freshname)
@@ -82,10 +78,8 @@ trait Macros { self: Quasiquotes =>
 
   trait TermParsing {
     def parse(code: String, placeholders: Set[String]): Tree =
-      if (code.trim.startsWith("case"))
-        CaseParser.parse(code, placeholders)
-      else
-        TermParser.parse(code, placeholders)
+      if (code.trim.startsWith("case")) CaseParser.parse(code, placeholders)
+      else TermParser.parse(code, placeholders)
   }
 
   trait TypeParsing {

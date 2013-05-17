@@ -8,7 +8,6 @@ import scala.reflect.runtime.universe._
 import scala.reflect.runtime.universe.Flag._
 
 trait ArbitraryTreesAndNames {
-
   def smallList[T](size: Int, g: Gen[T]) = {
     val n: Int = choose(0, size / 2 + 1).sample match {
       case Some(i) => i
@@ -19,11 +18,8 @@ trait ArbitraryTreesAndNames {
 
   def shortIdent(len: Int) =
     for(name <- identifier)
-      yield
-        if(name.length <= len)
-          name
-        else
-          name.substring(0, len - 1)
+      yield if(name.length <= len) name
+            else name.substring(0, len - 1)
 
   def genTermName = for(name <- shortIdent(8)) yield TermName(name)
   def genTypeName = for(name <- shortIdent(8)) yield TypeName(name)
@@ -235,40 +231,34 @@ trait ArbitraryTreesAndNames {
       yield DependentTypeTree(tpt, args)
 
   def genTree(size: Int): Gen[Tree] =
-    if(size <= 1)
-      oneOf(EmptyTree, genTreeIsTerm(size), genTreeIsType(size))
-    else
-      oneOf(genTree(1),
-            // these trees are neither terms nor types
-            genPackageDef(size - 1), genModuleDef(size - 1),
-            genCaseDef(size - 1), genDefDef(size - 1),
-            genTypeDef(size - 1), genTemplate(size - 1),
-            genClassDef(size - 1), genValDef(size - 1),
-            genImport(size - 1))
+    if (size <= 1) oneOf(EmptyTree, genTreeIsTerm(size), genTreeIsType(size))
+    else oneOf(genTree(1),
+               // these trees are neither terms nor types
+               genPackageDef(size - 1), genModuleDef(size - 1),
+               genCaseDef(size - 1), genDefDef(size - 1),
+               genTypeDef(size - 1), genTemplate(size - 1),
+               genClassDef(size - 1), genValDef(size - 1),
+               genImport(size - 1))
 
   def genTreeIsTerm(size: Int): Gen[Tree] =
-    if(size <= 1)
-      oneOf(genLiteral, genIdent(genTermName))
-    else
-      oneOf(genTreeIsTerm(1), genBind(size - 1, genTermName),
-            genAnnotated(size - 1, genTreeIsTerm), genSelect(size - 1, genTermName),
-            genAlternative(size - 1), genApply(size - 1), genAssign(size - 1),
-            genAssignOrNamedArg(size - 1), genBlock(size - 1), genFunction(size - 1),
-            genIf(size - 1), genLabelDef(size - 1), genMatch(size - 1), genNew(size - 1),
-            genReturn(size - 1), genStar(size - 1), genSuper(size - 1), genThis(size - 1),
-            genThrow(size - 1), genTry(size - 1), genTypeApply(size - 1),
-            genTyped(size - 1), genUnApply(size - 1))
+    if (size <= 1) oneOf(genLiteral, genIdent(genTermName))
+    else oneOf(genTreeIsTerm(1), genBind(size - 1, genTermName),
+               genAnnotated(size - 1, genTreeIsTerm), genSelect(size - 1, genTermName),
+               genAlternative(size - 1), genApply(size - 1), genAssign(size - 1),
+               genAssignOrNamedArg(size - 1), genBlock(size - 1), genFunction(size - 1),
+               genIf(size - 1), genLabelDef(size - 1), genMatch(size - 1), genNew(size - 1),
+               genReturn(size - 1), genStar(size - 1), genSuper(size - 1), genThis(size - 1),
+               genThrow(size - 1), genTry(size - 1), genTypeApply(size - 1),
+               genTyped(size - 1), genUnApply(size - 1))
 
   def genTreeIsType(size: Int): Gen[Tree] =
-    if(size <= 1)
-      genIdent(genTypeName)
-    else
-      oneOf(genTreeIsType(1), genAnnotated(size - 1, genTreeIsType),
-            genBind(size - 1, genTypeName), genSelect(size - 1, genTypeName),
-            genSingletonTypeTree(size - 1), genSelectFromTypeTree(size - 1),
-            genExistentialTypeTree(size - 1), genCompoundTypeTree(size - 1),
-            genAppliedTypeTree(size - 1), genDependentTypeTree(size - 1),
-            genTypeBoundsTree(size - 1))
+    if (size <= 1) genIdent(genTypeName)
+    else oneOf(genTreeIsType(1), genAnnotated(size - 1, genTreeIsType),
+               genBind(size - 1, genTypeName), genSelect(size - 1, genTypeName),
+               genSingletonTypeTree(size - 1), genSelectFromTypeTree(size - 1),
+               genExistentialTypeTree(size - 1), genCompoundTypeTree(size - 1),
+               genAppliedTypeTree(size - 1), genDependentTypeTree(size - 1),
+               genTypeBoundsTree(size - 1))
 
   /*  These are marker types that allow to write tests that
    *  depend specificly on Trees that are terms or types.

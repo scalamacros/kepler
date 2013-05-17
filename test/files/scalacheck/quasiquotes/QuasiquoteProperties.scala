@@ -6,7 +6,6 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 
 class QuasiquoteProperties(name: String) extends Properties(name) with ArbitraryTreesAndNames {
-
   /** Runs a code block and returns proof confirmation
    *  if no exception has been thrown while executing code
    *  block. This is useful for simple one-off tests.

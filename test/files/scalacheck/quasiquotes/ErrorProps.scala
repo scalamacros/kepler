@@ -7,7 +7,6 @@ import scala.reflect.runtime.universe._
 import Flag._
 
 object ErrorProps extends QuasiquoteProperties("errors") {
-
   // // This test fails due to bug in untyped macro expansion
   // property("deconstruction: can't use two '..' cardinalities in a row") = fails (
   //   "Can't extract a part of the tree with '..' cardinality in this position."

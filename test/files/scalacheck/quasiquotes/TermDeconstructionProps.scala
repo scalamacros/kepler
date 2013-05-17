@@ -7,7 +7,6 @@ import scala.reflect.runtime.universe._
 import Flag._
 
 object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction") {
-
   property("f(x)") = forAll { (x: Tree) =>
     val q"f($x1)" = q"f($x)"
     x1 ≈ x
@@ -81,6 +80,21 @@ object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction
   property("class tparams") = test {
     val q"class $name[..$tparams]" = q"class Foo[A, B]"
     assert(tparams.map { _.name } == List(TypeName("A"), TypeName("B")))
+  }
+
+  property("deconstruct unit as tuple") = test {
+    val q"(..$xs)" = q"()"
+    assert(xs.isEmpty)
+  }
+
+  property("deconstruct tuple") = test {
+    val q"(..$xs)" = q"(a, b)"
+    assert(xs ≈ List(q"a", q"b"))
+  }
+
+  property("deconstruct tuple mixed") = test {
+    val q"($first, ..$rest)" = q"(a, b, c)"
+    assert(first ≈ q"a" && rest ≈ List(q"b", q"c"))
   }
 
   // TODO: FIX ME

@@ -28,7 +28,6 @@ trait Reifiers { self: Quasiquotes =>
   }
 
   abstract class Reifier(val universe: Tree, val placeholders: Placeholders) extends {
-
     val global: self.global.type = self.global
     val mirror = EmptyTree
     val typer = null
@@ -36,7 +35,6 @@ trait Reifiers { self: Quasiquotes =>
     val concrete = false
 
   } with ReflectReifier with Types {
-
     // shortcut
     val u = universe
 
@@ -63,7 +61,6 @@ trait Reifiers { self: Quasiquotes =>
     }
 
     object AnnotPlaceholder {
-
       def unapply(tree: Tree): Option[(String, List[Tree])] = tree match {
         case Apply(Select(New(Placeholder(name)), nme.CONSTRUCTOR), args) => Some((name, args))
         case _ => None
@@ -71,7 +68,6 @@ trait Reifiers { self: Quasiquotes =>
     }
 
     object ModsPlaceholder {
-
       def unapply(tree: Tree): Option[String] = tree match {
         case q"new ${Ident(tpnme.QUASIQUOTE_MODS)}(${Literal(Constant(s: String))})" =>
           Some(s)
@@ -114,7 +110,6 @@ trait Reifiers { self: Quasiquotes =>
   }
 
   class ApplyReifier(universe: Tree, placeholders: Placeholders) extends Reifier(universe, placeholders) {
-
     def isSupportedZeroCardinalityType(tpe: Type): Boolean =
       tpe <:< treeType || tpe <:< nameType || tpe <:< modsType || tpe <:< flagsType
 
@@ -172,39 +167,51 @@ trait Reifiers { self: Quasiquotes =>
       }
 
       def iterableN(n: Int, tpe: Type): Type =
-        if (n == 0)
-          tpe
-        else
-          appliedType(IterableClass.toType, List(iterableN(n - 1, tpe)))
+        if (n == 0) tpe
+        else appliedType(IterableClass.toType, List(iterableN(n - 1, tpe)))
 
       def extractIterableN(n: Int, tpe: Type): Option[Type] =
-        if (n == 0)
-          Some(tpe)
-        else
-          if (tpe <:< iterableType)
-            extractIterableN(n - 1, tpe.typeArguments(0))
-          else
-            None
+        if (n == 0) Some(tpe)
+        else if (tpe <:< iterableType) extractIterableN(n - 1, tpe.typeArguments(0))
+        else None
     }
 
     override def reifyBasicTree(tree: Tree): Tree = tree match {
       case Literal(Constant(true)) => q"$u.build.True"
       case Literal(Constant(false)) => q"$u.build.False"
       case Placeholder(CorrespondsTo(tree, tpe)) if tpe <:< treeType => tree
+      case AppliedTypeTree(Ident(tpnme.QUASIQUOTE_TUPLE_TYPE), args) => reifyTupleType(args)
+      case Apply(Ident(nme.QUASIQUOTE_TUPLE), args) => reifyTuple(args)
       case Apply(f, List(Placeholder(CorrespondsTo(argss, tpe)))) if tpe <:< iterableIterableTreeType =>
         val f1 = reifyTree(f)
         q"$argss.foldLeft[$u.Tree]($f1) { $u.Apply(_, _) }"
       case Block(stats, p @ Placeholder(CorrespondsTo(tree, tpe))) =>
         mirrorBuildCall("Block", reifyList(stats :+ p))
-      case Placeholder(name) if placeholders(name)._2 > 0 =>
-        val (tree, card) = placeholders(name)
-        c.abort(tree.pos, s"Can't splice tree with '${fmtCard(card)}' cardinality in this position.")
       case SyntacticalClassDef(mods, name, tparams, constrmods, argss, parents, selfval, body) =>
         mirrorBuildCall("SyntacticalClassDef", reifyModifiers(mods), reifyName(name),
                         reifyList(tparams), reifyModifiers(constrmods), reifyList(argss),
                         reifyList(parents), reifyTree(selfval), reifyList(body))
+      case Placeholder(name) if placeholders(name)._2 > 0 =>
+        val (tree, card) = placeholders(name)
+        c.abort(tree.pos, s"Can't splice tree with '${fmtCard(card)}' cardinality in this position.")
       case _ =>
         super.reifyBasicTree(tree)
+    }
+
+    def reifyTuple(args: List[Tree]) = args match {
+      case Nil => reify(q"()")
+      case List(hole @ Placeholder(CorrespondsTo(tree, tpe))) if !(tpe <:< iterableType) => reify(hole)
+      case List(Placeholder(_)) => mirrorBuildCall("TupleN", reifyList(args))
+      case List(other) => reify(other)
+      case _ => mirrorBuildCall("TupleN", reifyList(args))
+    }
+
+    def reifyTupleType(args: List[Tree]) = args match {
+      case Nil => reify(tq"scala.Unit")
+      case List(hole @ Placeholder(CorrespondsTo(tree, tpe))) if !(tpe <:< iterableType) => reify(hole)
+      case List(Placeholder(_)) => mirrorBuildCall("TupleTypeN", reifyList(args))
+      case List(other) => reify(other)
+      case _ => mirrorBuildCall("TupleTypeN", reifyList(args))
     }
 
     override def reifyName(name: Name): Tree = name match {
@@ -309,7 +316,6 @@ trait Reifiers { self: Quasiquotes =>
   }
 
   class ApplyReifierWithSymbolSplicing(universe: Tree, placeholders: Placeholders) extends ApplyReifier(universe, placeholders) {
-
     override def isSupportedZeroCardinalityType(tpe: Type) =
       super.isSupportedZeroCardinalityType(tpe) || tpe <:< symbolType
 
@@ -324,7 +330,6 @@ trait Reifiers { self: Quasiquotes =>
   }
 
   class UnapplyReifier(universe: Tree, placeholders: Placeholders) extends Reifier(universe, placeholders) {
-
     object CorrespondsTo {
       def unapply(name: String): Option[(Tree, Int)] =
         placeholders.get(name)
@@ -339,6 +344,8 @@ trait Reifiers { self: Quasiquotes =>
         if (card > 0)
           c.abort(tree.pos, s"Can't extract a part of the tree with '${fmtCard(card)}' cardinality in this position.")
         tree
+      case AppliedTypeTree(Ident(tpnme.QUASIQUOTE_TUPLE_TYPE), args) => reifyTupleType(args)
+      case Apply(Ident(nme.QUASIQUOTE_TUPLE), args) => reifyTuple(args)
       case Applied(fun, targs, argss) if fun != tree =>
         if (targs.length > 0)
           mirrorBuildCall("Applied", reify(fun), reifyList(targs), reifyList(argss))
@@ -350,6 +357,22 @@ trait Reifiers { self: Quasiquotes =>
                         reifyList(parents), reifyTree(selfval), reifyList(body))
       case _ =>
         super.reifyBasicTree(tree)
+    }
+
+    def reifyTuple(args: List[Tree]) = args match {
+      case Nil => reify(q"()")
+      case List(hole @ Placeholder(CorrespondsTo(tree, 0))) => reify(hole)
+      case List(Placeholder(CorrespondsTo(tree, card))) => mirrorBuildCall("TupleN", reifyList(args))
+      case List(other) => reify(other)
+      case _ => mirrorBuildCall("TupleN", reifyList(args))
+    }
+
+    def reifyTupleType(args: List[Tree]) = args match {
+      case Nil => reify(tq"scala.Unit")
+      case List(hole @ Placeholder(CorrespondsTo(tree, 0))) => reify(hole)
+      case List(Placeholder(CorrespondsTo(tree, card))) => mirrorBuildCall("TupleTypeN", reifyList(args))
+      case List(other) => reify(other)
+      case _ => mirrorBuildCall("TupleTypeN", reifyList(args))
     }
 
     override def scalaFactoryCall(name: String, args: Tree*): Tree =

@@ -26,14 +26,20 @@ import util.FreshNameCreator
  *  the beginnings of a campaign against this latest incursion by Cutty
  *  McPastington and his army of very similar soldiers.
  */
-trait ParsersCommon extends ScannersCommon {
+trait ParsersCommon extends ScannersCommon { self =>
   val global : Global
   import global._
+
+  trait ParserTreeBuilder extends TreeBuilder {
+    val global: self.global.type = self.global
+    def o2p(offset: Int): Position                    = new OffsetPosition(currentUnit.source, offset)
+    def r2p(start: Int, mid: Int, end: Int): Position = rangePos(currentUnit.source, start, mid, end)
+  }
 
   /** This is now an abstract class, only to work around the optimizer:
    *  methods in traits are never inlined.
    */
-  abstract class ParserCommon {
+  abstract class ParserCommon extends ParserTreeBuilder  {
     val in: ScannerCommon
     def freshName(prefix: String): Name
     def freshTermName(prefix: String): TermName
@@ -153,9 +159,6 @@ self =>
     def freshTermName(prefix: String): TermName = newTermName(globalFresh.newName(prefix))
     def freshTypeName(prefix: String): TypeName = newTypeName(globalFresh.newName(prefix))
 
-    def o2p(offset: Int): Position = new OffsetPosition(source, offset)
-    def r2p(start: Int, mid: Int, end: Int): Position = rangePos(source, start, mid, end)
-
     // suppress warnings; silent abort on errors
     def warning(offset: Int, msg: String) {}
     def deprecationWarning(offset: Int, msg: String) {}
@@ -271,16 +274,8 @@ self =>
   abstract class Parser extends ParserCommon {
     val in: Scanner
 
-    def freshName(prefix: String): Name
-    def freshTermName(prefix: String): TermName
-    def freshTypeName(prefix: String): TypeName
-    def o2p(offset: Int): Position
-    def r2p(start: Int, mid: Int, end: Int): Position
-
     /** whether a non-continuable syntax error has been seen */
     private var lastErrorOffset : Int = -1
-
-    import treeBuilder.{global => _, _}
 
     /** The types of the context bounds of type parameters of the surrounding class
      */

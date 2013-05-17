@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
 /** Methods for building trees, used in the parser.  All the trees
  *  returned by this class must be untyped.
  */
-abstract class TreeBuilder {
+trait TreeBuilder {
 
   val global: Global
   import global._

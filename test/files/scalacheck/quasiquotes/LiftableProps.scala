@@ -7,7 +7,6 @@ import scala.reflect.runtime.universe._
 import Flag._
 
 object LiftableProps extends QuasiquoteProperties("liftable") {
-
   property("splice byte") = test {
     val c: Byte = 0
     assert(q"$c" ≈ Literal(Constant(c)))

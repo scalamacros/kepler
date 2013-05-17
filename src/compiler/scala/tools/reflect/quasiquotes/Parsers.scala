@@ -11,11 +11,9 @@ trait Parsers { self: Quasiquotes =>
   import global._
 
   abstract class Parser extends {
-
     val global: self.global.type = self.global
 
   } with ScalaParser {
-
     def wrapCode(code: String): String =
       s"object wrapper { $$wrapper$$self => $EOL $code $EOL }"
 
@@ -43,9 +41,16 @@ trait Parsers { self: Quasiquotes =>
       // q"def foo($x)"
       override def allowTypelessParams = true
 
+      // q"(..$xs)"
+      override def makeTupleTerm(trees: List[Tree], flattenUnary: Boolean): Tree =
+        Apply(Ident(nme.QUASIQUOTE_TUPLE), trees)
+
+      // tq"(..$xs)"
+      override def makeTupleType(trees: List[Tree], flattenUnary: Boolean): Tree =
+        AppliedTypeTree(Ident(tpnme.QUASIQUOTE_TUPLE_TYPE), trees)
+
       // q"{ $x }"
-      override def block(): Tree = makeBlock(blockStatSeq())
-      private def makeBlock(stats: List[Tree]): Tree =
+      override def makeBlock(stats: List[Tree]): Tree =
         if (stats.isEmpty) Literal(Constant())
         else if (!stats.last.isTerm) Block(stats, Literal(Constant()))
         else if (stats.length == 1) stats match {
@@ -55,7 +60,7 @@ trait Parsers { self: Quasiquotes =>
 
       // q"foo match { $x }"
       override def caseClauses(): List[CaseDef] = {
-        val cases = caseSeparated { atPos(in.offset)(treeBuilder.makeCaseDef(pattern(), guard(), caseBlock())) }
+        val cases = caseSeparated { atPos(in.offset)(makeCaseDef(pattern(), guard(), caseBlock())) }
         if (cases.isEmpty) {
           if (in.token == IDENTIFIER && placeholders(in.name.toString)) ???
           else accept(CASE) // trigger error if there are no cases and noone gets spliced
@@ -114,7 +119,7 @@ trait Parsers { self: Quasiquotes =>
           if (in.token == AT) {
             in.nextToken()
             annots += annot
-          } else if(isPlaceholder && ahead { in.token == AT || isModifier || isDefIntro || isIdent}) {
+          } else if (isPlaceholder && ahead { in.token == AT || isModifier || isDefIntro || isIdent}) {
             println(s"consuming ${in.name}")
             annots += modsPlaceholderAnnot(in.name)
             in.nextToken()
@@ -140,7 +145,6 @@ trait Parsers { self: Quasiquotes =>
   object TermParser extends Parser
 
   object CaseParser extends Parser {
-
     override def wrapCode(code: String) = super.wrapCode("something match { " + code + " }")
 
     override def unwrapTree(wrappedTree: Tree): Tree = {
@@ -152,7 +156,6 @@ trait Parsers { self: Quasiquotes =>
   }
 
   object TypeParser extends Parser {
-
     override def wrapCode(code: String) = super.wrapCode("type T = " + code)
 
     override def unwrapTree(wrappedTree: Tree): Tree = {
