@@ -126,7 +126,7 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       makeParam(nme.syntheticParamName(count), tpt)
     def makeParam(name: String, tpt: Tree): ValDef =
       makeParam(name: TermName, tpt)
-    override def makeParam(name: TermName, tpt: Tree): ValDef =
+    def makeParam(name: TermName, tpt: Tree): ValDef =
       ValDef(Modifiers(Flags.JAVA | Flags.PARAM), name, tpt, EmptyTree)
 
     def makeConstructor(formals: List[Tree]) = {

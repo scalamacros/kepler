@@ -14,6 +14,7 @@ trait Parsers { self: Quasiquotes =>
     val global: self.global.type = self.global
 
   } with ScalaParser {
+
     def wrapCode(code: String): String =
       s"object wrapper { $$wrapper$$self => $EOL $code $EOL }"
 
@@ -38,25 +39,29 @@ trait Parsers { self: Quasiquotes =>
     }
 
     class QuasiquoteParser(source0: SourceFile, placeholders: Set[String]) extends SourceFileParser(source0) {
+
+      override val treeBuilder = new ParserTreeBuilder {
+        // q"(..$xs)"
+        override def makeTupleTerm(trees: List[Tree], flattenUnary: Boolean): Tree =
+          Apply(Ident(nme.QUASIQUOTE_TUPLE), trees)
+
+        // tq"(..$xs)"
+        override def makeTupleType(trees: List[Tree], flattenUnary: Boolean): Tree =
+          AppliedTypeTree(Ident(tpnme.QUASIQUOTE_TUPLE_TYPE), trees)
+
+        // q"{ $x }"
+        override def makeBlock(stats: List[Tree]): Tree =
+          if (stats.isEmpty) Literal(Constant())
+          else if (!stats.last.isTerm) Block(stats, Literal(Constant()))
+          else if (stats.length == 1) stats match {
+            case Ident(TermName(name)) :: Nil if placeholders(name) => Block(stats.init, stats.last)
+            case _ => stats.head
+          } else Block(stats.init, stats.last)
+      }
+      import treeBuilder.{global => _, _}
+
       // q"def foo($x)"
       override def allowTypelessParams = true
-
-      // q"(..$xs)"
-      override def makeTupleTerm(trees: List[Tree], flattenUnary: Boolean): Tree =
-        Apply(Ident(nme.QUASIQUOTE_TUPLE), trees)
-
-      // tq"(..$xs)"
-      override def makeTupleType(trees: List[Tree], flattenUnary: Boolean): Tree =
-        AppliedTypeTree(Ident(tpnme.QUASIQUOTE_TUPLE_TYPE), trees)
-
-      // q"{ $x }"
-      override def makeBlock(stats: List[Tree]): Tree =
-        if (stats.isEmpty) Literal(Constant())
-        else if (!stats.last.isTerm) Block(stats, Literal(Constant()))
-        else if (stats.length == 1) stats match {
-          case Ident(TermName(name)) :: Nil if placeholders(name) => Block(stats.init, stats.last)
-          case _ => stats.head
-        } else Block(stats.init, stats.last)
 
       // q"foo match { $x }"
       override def caseClauses(): List[CaseDef] = {
